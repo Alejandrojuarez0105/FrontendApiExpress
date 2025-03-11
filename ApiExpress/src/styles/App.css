@@ -1,0 +1,135 @@
+/* App.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #111; /* Fondo negro */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  color: #fff; /* Texto blanco para contraste */
+}
+
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+h1 {
+  color: #fff;
+  font-size: 36px;
+  margin-bottom: 20px;
+  animation: fadeIn 1s ease-in-out;
+}
+
+form {
+  background: #1e1e1e; /* Fondo oscuro para el formulario */
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); /* Sombras suaves */
+  width: 350px;
+  opacity: 0;
+  animation: fadeInForm 1s ease-in-out forwards;
+}
+
+form div {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+form label {
+  font-size: 14px;
+  color: #bbb; /* Etiquetas en gris claro */
+  margin-bottom: 8px;
+  display: block;
+}
+
+form input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #444; /* Bordes suaves */
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #333; /* Fondo oscuro para los inputs */
+  color: #fff; /* Texto blanco en los inputs */
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+form input:focus {
+  border-color: #4caf50; /* Resaltar el borde en verde al enfocar */
+  background-color: #444; /* Oscurecer ligeramente el fondo del input */
+  outline: none;
+}
+
+form button {
+  padding: 12px;
+  font-size: 16px;
+  background-color: #4caf50; /* Verde brillante para el botón */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+form button:hover {
+  background-color: #45a049; /* Verde oscuro al pasar el mouse */
+  transform: translateY(-2px);
+}
+
+form button:active {
+  transform: translateY(2px);
+}
+
+form .error-message {
+  color: #e74c3c; /* Rojo brillante para el mensaje de error */
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.password-container {
+  position: relative;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #bbb; /* Color de los íconos del ojo */
+  font-size: 20px;
+  transition: color 0.3s ease;
+}
+
+.eye-icon:hover {
+  color: #4caf50; /* Cambia el color a verde al pasar el mouse */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInForm {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
