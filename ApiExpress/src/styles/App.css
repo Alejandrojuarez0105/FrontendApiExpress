@@ -1,7 +1,6 @@
 /* Estilos generales */
 body {
-  background-color: #f4f4f2 !important; /* Fondo negro */
-  color: #fff; /* Texto blanco */
+  background-color: #f4f4f2 !important;
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
@@ -10,21 +9,18 @@ body {
   align-items: center;
 }
 
-h1 {
-  text-align: center;
-  color: #fff;
+.login-form {
+  max-width: 400px;
+  width: 100%;
+  background-color: #F2F2EF;
+  border: 1px solid black;
+  border-radius: 30px;
 }
 
-.login-form {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #222; /* Fondo oscuro para el formulario */
-  padding: 30px;
-  border-radius: 10px;
-  width: 300px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra para el formulario */
+h1 {
+  font-size: 1.5rem;
+  color: #333;
+  text-align: center;
 }
 
 form {
@@ -33,38 +29,31 @@ form {
   width: 100%;
 }
 
-form div {
-  margin-bottom: 15px;
-}
-
 form label {
   margin-bottom: 5px;
   font-size: 14px;
 }
 
-/* Estilos para los inputs (email y password) */
 form input {
   padding: 10px;
   font-size: 14px;
   border-radius: 4px;
   border: 1px solid #ccc;
-  background-color: #333; /* Fondo oscuro para el input */
-  color: #fff; /* Texto blanco */
-  width: 100%; /* Asegura que todos los inputs tengan el mismo ancho */
-  box-sizing: border-box; /* Incluye el padding en el ancho total */
+  background-color: #e8e8e8;
+  color: #424242;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 form input:focus {
-  border-color: #4caf50; /* Color del borde cuando está enfocado */
+  border-color: #4caf50;
 }
 
-/* Contenedor de la contraseña con posición relativa */
 .password-container {
   position: relative;
   width: 100%;
 }
 
-/* Estilo para el ícono del ojo */
 .eye-icon {
   position: absolute;
   right: 10px;
@@ -72,7 +61,7 @@ form input:focus {
   transform: translateY(-50%);
   cursor: pointer;
   font-size: 18px;
-  color: #fff; /* Color del ojo */
+  color: #fff;
 }
 
 form button {
@@ -83,7 +72,7 @@ form button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  width: 100%; /* Asegura que el botón tenga el mismo ancho que los inputs */
+  width: 100%;
 }
 
 form button:hover {
@@ -91,7 +80,7 @@ form button:hover {
 }
 
 form .error-message {
-  color: red;
+  color: #ED413E;
   text-align: center;
   font-size: 14px;
 }
