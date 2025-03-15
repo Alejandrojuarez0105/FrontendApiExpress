@@ -53,7 +53,7 @@ const Hoteles: React.FC = () => {
 
   return (
     <div className="container mt-5">
-      <h2 className="text-center mb-5">Lista de Hoteles</h2>
+      <h2 className="text-center mb-5" style={{ color: 'black' }}>Lista de Hoteles</h2>
 
       {hoteles.length > 0 ? (
         <div className="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">

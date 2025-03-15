@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 
 const LoginForm: React.FC = () => {
-  const navigate = useNavigate();
   const { setUserId, setUser } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

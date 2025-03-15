@@ -4,7 +4,7 @@ import Configuraciones from "./components/Configuraciones";
 import Hoteles from "./components/Hoteles";
 import LoginForm from "./components/LoginForm";
 import Reservas from "./components/Reservas";
-import UsuarioTest from "./components/UsuarioTest";
+import Dashboard from "./components/Dashboard";
 import { useUser } from "./context/UserContext";
 import { UserProvider } from "./context/UserContext";
 
@@ -51,11 +51,11 @@ const AppContent: React.FC = () => {
     <Routes>
       <Route
         path="/"
-        element={isAuthenticated ? <Navigate to="/usuario_test" replace /> : <LoginForm />}
+        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginForm />}
       />
       {isAuthenticated ? (
         <>
-          <Route path="/usuario_test" element={<UsuarioTest />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/reservas" element={<Reservas />} />
           <Route path="/hoteles" element={<Hoteles />} />
           <Route path="/configuraciones" element={<Configuraciones />} />
