@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Route, Routes, Navigate, useLocation } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import Configuraciones from "./components/Configuraciones";
 import Hoteles from "./components/Hoteles";
 import LoginForm from "./components/LoginForm";
 import Reservas from "./components/Reservas";
 import UsuarioTest from "./components/UsuarioTest";
-import { UserProvider, useUser } from "./context/UserContext";
+import { useUser } from "./context/UserContext";
+import { UserProvider } from "./context/UserContext";
 
 const API_URL = "http://localhost:3000/api/auth/validate-token";
 
@@ -25,7 +26,7 @@ const AppContent: React.FC = () => {
 
         if (data.valid && data.user) {
           setIsAuthenticated(true);
-          setUserId(data.user._id);
+          setUserId(data.user.userId);
         } else {
           setIsAuthenticated(false);
           setUser(null);

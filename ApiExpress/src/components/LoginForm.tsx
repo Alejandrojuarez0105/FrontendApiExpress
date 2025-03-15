@@ -4,7 +4,7 @@ import { useUser } from '../context/UserContext';
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
-  const { setUserId } = useUser();
+  const { setUserId, setUser } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -32,6 +32,7 @@ const LoginForm: React.FC = () => {
 
       if (data.user && data.user._id) {
         setUserId(data.user._id);
+        setUser(data.user);
         navigate('/usuario_test', { replace: true });
       } else {
         throw new Error('Error al obtener el ID del usuario');
