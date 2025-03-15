@@ -31,9 +31,9 @@ const LoginForm: React.FC = () => {
       const data = await response.json();
 
       if (data.user && data.user._id) {
+        window.location.reload();
         setUserId(data.user._id);
         setUser(data.user);
-        navigate('/usuario_test', { replace: true });
       } else {
         throw new Error('Error al obtener el ID del usuario');
       }
