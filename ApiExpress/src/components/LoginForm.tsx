@@ -1,19 +1,45 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
+  const { setUserId } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === 'test@example.com' && password === 'password') {
-      navigate('/usuario_test');
-    } else {
-      setError('Credenciales incorrectas');
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: email, password }),
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Credenciales incorrectas');
+      }
+
+      const data = await response.json();
+
+      if (data.user && data.user._id) {
+        setUserId(data.user._id);
+        navigate('/usuario_test', { replace: true });
+      } else {
+        throw new Error('Error al obtener el ID del usuario');
+      }
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -25,8 +51,7 @@ const LoginForm: React.FC = () => {
           <div className="mb-3">
             <label htmlFor="email" className="form-label">Email:</label>
             <input
-              type="email"
-              id="email"
+              id="user"
               className="form-control"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -54,7 +79,15 @@ const LoginForm: React.FC = () => {
             </div>
           </div>
           {error && <div className="text-danger text-center mb-3">{error}</div>}
-          <button type="submit" className="btn btn-success w-100 mt-3">Log In</button>
+          {isLoading ? (
+            <div className="d-flex justify-content-center mb-3">
+              <div className="spinner-border" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          ) : (
+            <button type="submit" className="btn btn-success w-100 mt-3">Log In</button>
+          )}
         </form>
       </div>
     </div>

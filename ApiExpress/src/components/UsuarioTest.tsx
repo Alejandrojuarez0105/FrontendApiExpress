@@ -13,7 +13,7 @@ const UsuarioTest: React.FC = () => {
 
   return (
     <div className="usuario-test">
-      <h2>Hola, Test</h2> {/* Saludo que aparecerá después de iniciar sesión */}
+      <h2>Hola, Test</h2>
       <div>
         <button onClick={() => navigate('/reservas')}>Reservas</button>
         <button onClick={() => navigate('/hoteles')}>Hoteles</button>
