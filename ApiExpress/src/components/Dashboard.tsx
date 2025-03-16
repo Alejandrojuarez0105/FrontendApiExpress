@@ -164,9 +164,18 @@ function SidebarFooterAccount() {
     return null;
   }
 
-  const handleLogout = () => {
-    alert("Has cerrado sesión.");
-  };
+  const handleLogout = async () => {
+    try {
+      await fetch('http://localhost:3000/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      window.location.reload();
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+      alert('Hubo un problema al cerrar sesión. Inténtalo de nuevo.');
+    }
+  };  
 
   return (
     <Stack direction="column">
