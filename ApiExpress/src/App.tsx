@@ -39,7 +39,7 @@ const AppContent: React.FC = () => {
 
     checkAuth();
 
-    const interval = setInterval(checkAuth, 10000);
+    const interval = setInterval(checkAuth, 900000);
     return () => clearInterval(interval);
   }, []);
 
