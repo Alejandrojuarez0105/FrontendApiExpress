@@ -6,16 +6,24 @@ const Configuraciones: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="d-flex justify-content-center align-items-center min-vh-100">
+      <div className="d-flex justify-content-center align-items-center h-100">
         <p>Cargando datos del usuario...</p>
       </div>
     );
   }
 
   return (
-    <div className="d-flex justify-content-center align-items-center min-vh-100">
+    <div className="d-flex justify-content-center align-items-center h-100">
       <div className="card shadow p-4" style={{ width: '400px' }}>
         <h2 className="text-center mb-3">Perfil de Usuario</h2>
+        <div className="text-center mb-3">
+          <img
+            src={user.profilePicture || ''}
+            alt="Foto de perfil"
+            className="img-fluid rounded-circle"
+            style={{ width: '150px', height: '150px' }}
+          />
+        </div>
         <div className="mb-2"><strong>Nombre:</strong> {user.nombre || 'No disponible'}</div>
         <div className="mb-2"><strong>Email:</strong> {user.email || 'No disponible'}</div>
         <div className="mb-2"><strong>Teléfono:</strong> {user.telefono || 'No disponible'}</div>

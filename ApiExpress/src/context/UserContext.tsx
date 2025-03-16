@@ -7,6 +7,7 @@ interface User {
   telefono: string;
   historial_reservas: string[];
   username: string;
+  profilePicture: string;
 }
 
 interface UserContextType {
@@ -31,7 +32,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           }
 
           const data = await response.json();
-          setUser(data);
+          const profilePicture = `https://picsum.photos/500?random=${userId}`;
+          setUser({ ...data, profilePicture });
         } catch (error) {
           console.error("Error fetching user data:", error);
         }
