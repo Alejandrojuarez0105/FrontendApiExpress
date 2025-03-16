@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Box from '@mui/material/Box';
 import { 
   Container, 
@@ -25,6 +25,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { es } from 'date-fns/locale';
 import { useHotels } from '../context/HotelContext';
+import { useReservations } from '../context/ReservationContext';
+import { useUser } from '../context/UserContext';
 
 // Eliminamos los datos estáticos, ahora los obtendremos del contexto
 
@@ -39,7 +41,9 @@ interface FormData {
 
 const AddReservas: React.FC = () => {
   const theme = useTheme();
-  const { hotels, tiposHabitacion, loading, error, fetchHotels, fetchTiposHabitacion } = useHotels();
+  const { hotels, tiposHabitacion, loading: hotelsLoading, error: hotelsError, fetchHotels, fetchTiposHabitacion } = useHotels();
+  const { refreshReservations } = useReservations();
+  const { user } = useUser();
   
   // Estado para el formulario
   const [formData, setFormData] = useState<FormData>({
@@ -51,6 +55,12 @@ const AddReservas: React.FC = () => {
     comentarios: ''
   });
   
+  // Filtrar tipos de habitación según el hotel seleccionado
+  const tiposHabitacionFiltrados = useMemo(() => {
+    if (!formData.hotelId) return [];
+    return tiposHabitacion.filter(tipo => tipo.hotel_id === formData.hotelId && tipo.disponibilidad);
+  }, [tiposHabitacion, formData.hotelId]);
+  
   // Estado para errores de validación
   const [errors, setErrors] = useState<Record<string, string>>({});
   
@@ -61,11 +71,17 @@ const AddReservas: React.FC = () => {
     severity: 'success' as 'success' | 'error'
   });
 
+  // Estado para indicar si está enviando el formulario
+  const [submitting, setSubmitting] = useState(false);
+
   // React.useEffect para refrescar los datos si es necesario
   React.useEffect(() => {
     // Si no hay hoteles o tipos de habitación, intentamos cargarlos
     if (hotels.length === 0) {
       fetchHotels();
+    }
+    if (tiposHabitacion.length === 0) {
+      fetchTiposHabitacion();
     }
   }, [hotels.length, tiposHabitacion.length, fetchHotels, fetchTiposHabitacion]);
 
@@ -83,7 +99,24 @@ const AddReservas: React.FC = () => {
   const handleSelectChange = (e: SelectChangeEvent) => {
     const name = e.target.name as keyof FormData;
     const value = e.target.value as string;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    if (name === 'tipoHabitacionId') {
+      // Si se está seleccionando un tipo de habitación, actualizar también el número de personas
+      const selectedRoom = tiposHabitacion.find(t => t._id === value);
+      if (selectedRoom) {
+        setFormData(prev => ({ 
+          ...prev, 
+          [name]: value,
+          // Establecer el número de personas igual a la capacidad de la habitación
+          numeroPersonas: selectedRoom.capacidad 
+        }));
+      } else {
+        setFormData(prev => ({ ...prev, [name]: value }));
+      }
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+    
     // Limpiar error al cambiar el valor
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -121,39 +154,53 @@ const AddReservas: React.FC = () => {
     }
     
     try {
-      // Aquí iría la lógica para enviar los datos al backend
-      // Ejemplo:
-      /*
-      const selectedHotel = hotels.find(h => h._id === formData.hotelId);
-      const selectedTipoHabitacion = tiposHabitacion.find(t => t._id === formData.tipoHabitacionId);
+      setSubmitting(true);
       
+      // Encontrar el tipo de habitación seleccionado
+      const selectedTipoHabitacion = tiposHabitacion.find(t => t._id === formData.tipoHabitacionId);
+      const selectedHotel = hotels.find(h => h._id === formData.hotelId);
+      
+      // Calcular el número de noches
+      const fechaInicio = formData.fechaInicio ? new Date(formData.fechaInicio) : null;
+      const fechaFin = formData.fechaFin ? new Date(formData.fechaFin) : null;
+      
+      let numNoches = 0;
+      if (fechaInicio && fechaFin) {
+        numNoches = Math.max(1, Math.ceil((fechaFin.getTime() - fechaInicio.getTime()) / (1000 * 60 * 60 * 24)));
+      }
+      
+      // Calcular precio total
+      const precioTotal = selectedTipoHabitacion?.precio_por_noche ? selectedTipoHabitacion.precio_por_noche * numNoches : 0;
+      
+      // Preparar datos para enviar al backend
       const reservaData = {
+        usuario_id: user?._id,
         hotel_id: formData.hotelId,
-        habitacion: {
-          tipo: selectedTipoHabitacion?.tipo,
-          capacidad: selectedTipoHabitacion?.capacidad
-        },
-        fecha_inicio: formData.fechaInicio?.toISOString().split('T')[0],
-        fecha_fin: formData.fechaFin?.toISOString().split('T')[0],
-        numero_personas: formData.numeroPersonas,
-        comentarios: formData.comentarios,
-        precio_total: selectedTipoHabitacion?.precio * (formData.fechaFin && formData.fechaInicio ? 
-                      Math.max(1, Math.ceil((formData.fechaFin.getTime() - formData.fechaInicio.getTime()) / (1000 * 60 * 60 * 24))) : 1)
+        habitacion_id: formData.tipoHabitacionId,
+        fecha_inicio: fechaInicio?.toISOString(),
+        fecha_fin: fechaFin?.toISOString(),
+        estado: "pendiente"
       };
       
+      console.log('Datos de la reserva a enviar:', reservaData);
+      
+      // Enviar los datos al backend
       const response = await fetch('http://localhost:3000/api/reservas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(reservaData),
         credentials: 'include'
-      });   
+      });
       
       if (!response.ok) {
         throw new Error('Error al crear la reserva');
       }
-      */
       
-      console.log('Datos de la reserva a enviar:', formData);
+      const data = await response.json();
+      console.log('Reserva creada:', data);
+      
+      // Refrescar las reservas para que la nueva aparezca en la lista
+      await refreshReservations();
       
       // Mostrar notificación de éxito
       setNotification({
@@ -178,6 +225,8 @@ const AddReservas: React.FC = () => {
         message: err instanceof Error ? err.message : 'Error al crear la reserva',
         severity: 'error'
       });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -187,7 +236,7 @@ const AddReservas: React.FC = () => {
   };
 
   // Si está cargando, mostrar indicador
-  if (loading) {
+  if (hotelsLoading) {
     return (
       <Box 
         display="flex" 
@@ -206,7 +255,7 @@ const AddReservas: React.FC = () => {
   }
 
   // Si hay un error, mostrar mensaje
-  if (error) {
+  if (hotelsError) {
     return (
       <Box 
         display="flex" 
@@ -215,7 +264,7 @@ const AddReservas: React.FC = () => {
         minHeight="100vh"
         sx={{ backgroundColor: theme.palette.background.default }}
       >
-        <Alert severity="error">{error}</Alert>
+        <Alert severity="error">{hotelsError}</Alert>
       </Box>
     );
   }
@@ -278,7 +327,11 @@ const AddReservas: React.FC = () => {
                       name="hotelId"
                       value={formData.hotelId}
                       label="Hotel"
-                      onChange={handleSelectChange}
+                      onChange={(e) => {
+                        handleSelectChange(e);
+                        // Al cambiar el hotel, reiniciamos el tipo de habitación
+                        setFormData(prev => ({ ...prev, tipoHabitacionId: '' }));
+                      }}
                     >
                       {hotels.map((hotel) => (
                         <MenuItem key={hotel._id} value={hotel._id}>
@@ -292,7 +345,11 @@ const AddReservas: React.FC = () => {
 
                 {/* Tipo de Habitación */}
                 <Grid item xs={12} md={6}>
-                  <FormControl fullWidth error={!!errors.tipoHabitacionId}>
+                  <FormControl 
+                    fullWidth 
+                    error={!!errors.tipoHabitacionId} 
+                    disabled={!formData.hotelId}
+                  >
                     <InputLabel id="tipo-habitacion-label">Tipo de Habitación</InputLabel>
                     <Select
                       labelId="tipo-habitacion-label"
@@ -302,15 +359,68 @@ const AddReservas: React.FC = () => {
                       label="Tipo de Habitación"
                       onChange={handleSelectChange}
                     >
-                      {tiposHabitacion.map((tipo) => (
+                      {tiposHabitacionFiltrados.map((tipo) => (
                         <MenuItem key={tipo._id} value={tipo._id}>
-                          {tipo.tipo} - {tipo.capacidad} {tipo.capacidad === 1 ? 'persona' : 'personas'} - {tipo.precio}€/noche
+                          {tipo.tipo} - {tipo.capacidad} {tipo.capacidad === 1 ? 'persona' : 'personas'} - {tipo.precio_por_noche}€/noche
                         </MenuItem>
                       ))}
                     </Select>
+                    {!formData.hotelId && <FormHelperText>Primero selecciona un hotel</FormHelperText>}
                     {errors.tipoHabitacionId && <FormHelperText>{errors.tipoHabitacionId}</FormHelperText>}
                   </FormControl>
                 </Grid>
+
+                {/* Mostrar información adicional sobre la habitación seleccionada */}
+                {formData.tipoHabitacionId && (
+                  <Grid item xs={12}>
+                    <Paper 
+                      elevation={1} 
+                      sx={{ 
+                        p: 2, 
+                        backgroundColor: theme.palette.background.default,
+                        border: `1px solid ${theme.palette.divider}`
+                      }}
+                    >
+                      <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                        Detalles de la habitación:
+                      </Typography>
+                      {(() => {
+                        const selectedTipo = tiposHabitacion.find(t => t._id === formData.tipoHabitacionId);
+                        const fechaInicio = formData.fechaInicio ? new Date(formData.fechaInicio) : null;
+                        const fechaFin = formData.fechaFin ? new Date(formData.fechaFin) : null;
+                        
+                        let numNoches = 0;
+                        if (fechaInicio && fechaFin) {
+                          numNoches = Math.max(1, Math.ceil((fechaFin.getTime() - fechaInicio.getTime()) / (1000 * 60 * 60 * 24)));
+                        }
+                        
+                        return (
+                          <Box>
+                            <Typography variant="body2">
+                              Tipo: {selectedTipo?.tipo}
+                            </Typography>
+                            <Typography variant="body2">
+                              Capacidad: {selectedTipo?.capacidad} {selectedTipo?.capacidad === 1 ? 'persona' : 'personas'}
+                            </Typography>
+                            <Typography variant="body2">
+                              Precio por noche: {selectedTipo?.precio_por_noche}€
+                            </Typography>
+                            {numNoches > 0 && (
+                              <>
+                                <Typography variant="body2">
+                                  Número de noches: {numNoches}
+                                </Typography>
+                                <Typography variant="body1" fontWeight="bold" sx={{ mt: 1 }}>
+                                  Precio total estimado: {selectedTipo?.precio_por_noche ? selectedTipo.precio_por_noche * numNoches : 0}€
+                                </Typography>
+                              </>
+                            )}
+                          </Box>
+                        );
+                      })()}
+                    </Paper>
+                  </Grid>
+                )}
 
                 {/* Fecha de Entrada */}
                 <Grid item xs={12} md={6}>
@@ -353,9 +463,20 @@ const AddReservas: React.FC = () => {
                     name="numeroPersonas"
                     label="Número de Personas"
                     type="number"
-                    InputProps={{ inputProps: { min: 1, max: 10 } }}
+                    InputProps={{ 
+                      inputProps: { 
+                        min: 1, 
+                        max: tiposHabitacion.find(t => t._id === formData.tipoHabitacionId)?.capacidad || 10 
+                      } 
+                    }}
                     value={formData.numeroPersonas}
                     onChange={handleInputChange}
+                    helperText={
+                      formData.tipoHabitacionId ? 
+                      `Máximo ${tiposHabitacion.find(t => t._id === formData.tipoHabitacionId)?.capacidad} personas para este tipo de habitación` : 
+                      'Seleccione un tipo de habitación primero'
+                    }
+                    disabled={!formData.tipoHabitacionId}
                   />
                 </Grid>
 
@@ -380,6 +501,7 @@ const AddReservas: React.FC = () => {
                     variant="contained"
                     color="primary"
                     size="large"
+                    disabled={submitting}
                     sx={{ 
                       py: 1.5, 
                       px: 4,
@@ -391,7 +513,12 @@ const AddReservas: React.FC = () => {
                       }
                     }}
                   >
-                    Crear Reserva
+                    {submitting ? (
+                      <>
+                        <CircularProgress size={24} sx={{ mr: 1, color: 'white' }} />
+                        Creando...
+                      </>
+                    ) : 'Crear Reserva'}
                   </Button>
                 </Grid>
               </Grid>

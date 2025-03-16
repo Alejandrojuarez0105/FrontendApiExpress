@@ -14,10 +14,11 @@ export interface Hotel {
 // Definimos la interfaz para el tipo de habitación
 export interface TipoHabitacion {
   _id: string;
+  hotel_id: string;
   tipo: string;
   capacidad: number;
-  precio: number;
-  descripcion?: string;
+  precio_por_noche: number;
+  disponibilidad: boolean;
 }
 
 // Definimos la interfaz para el contexto
@@ -82,7 +83,7 @@ export const HotelProvider: React.FC<HotelProviderProps> = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:3000/api/habitaciones/', {
+      const response = await fetch('http://localhost:3000/api/rooms', {
         credentials: 'include'
       });
       
@@ -103,6 +104,7 @@ export const HotelProvider: React.FC<HotelProviderProps> = ({ children }) => {
   // Cargar hoteles al montar el componente
   useEffect(() => {
     fetchHotels();
+    fetchTiposHabitacion();
   }, []);
 
   // Valor del contexto
