@@ -24,6 +24,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import Tooltip from '@mui/material/Tooltip';
 import { Zoom } from '@mui/material';
 import Reservas from './Reservas';
+import AddReservas from './AddReservas';
 
 interface DemoPageContentProps {
   pathname: string;
@@ -47,6 +48,18 @@ const NAVIGATION = [
     segment: 'reservas',
     title: 'Reservas',
     icon: <HomeRepairServiceSharp />,
+    children: [
+      {
+        segment: 'crear-reserva',
+        title: 'Crear Reserva',
+        icon: <HomeRepairServiceSharp />,
+      },
+      {
+        segment: 'mis-reservas',
+        title: 'Mis Reservas',
+        icon: <HomeRepairServiceSharp />,
+      },
+    ],
   },
   {
     segment: 'hoteles',
@@ -111,9 +124,12 @@ const demoTheme = createTheme({
 });
 
 function DemoPageContent({ pathname }: DemoPageContentProps) {
+  console.log('Pathname actual:', pathname);
+  
   const renderContent = () => {
     switch (pathname) {
       case '/dashboard':
+        console.log('Renderizando Dashboard');
         return (
           <Box
             sx={{
@@ -128,12 +144,55 @@ function DemoPageContent({ pathname }: DemoPageContentProps) {
           </Box>
         );
       case '/hoteles':
+        console.log('Renderizando Hoteles');
         return <Hoteles />;
-      case '/reservas':
-        return <Reservas />
+      case '/reservas/mis-reservas':
+        console.log('Renderizando Reservas');
+        try {
+          return <Reservas />;
+        } catch (error) {
+          console.error('Error al renderizar Reservas:', error);
+          return (
+            <Box
+              sx={{
+                py: 4,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+              }}
+            >
+              <Typography color="error">Error al cargar Reservas</Typography>
+              <Typography variant="body2">{String(error)}</Typography>
+            </Box>
+          );
+        }
+        case '/reservas/crear-reserva':
+          console.log('Renderizando Reservas');
+          try {
+            return <AddReservas />;
+          } catch (error) {
+            console.error('Error al renderizar Reservas:', error);
+            return (
+              <Box
+                sx={{
+                  py: 4,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  textAlign: 'center',
+                }}
+              >
+                <Typography color="error">Error al cargar Reservas</Typography>
+                <Typography variant="body2">{String(error)}</Typography>
+              </Box>
+            );
+          }
       case '/configuraciones':
+        console.log('Renderizando Configuraciones');
         return <Configuraciones />;
       default:
+        console.log('Ruta no encontrada:', pathname);
         return (
           <Box
             sx={{
