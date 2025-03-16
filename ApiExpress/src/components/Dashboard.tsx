@@ -24,7 +24,6 @@ import { useUser } from '../context/UserContext';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import Tooltip from '@mui/material/Tooltip';
 import { Zoom } from '@mui/material';
-import { useMediaQuery } from '@mui/material';
 
 interface DemoPageContentProps {
   pathname: string;
