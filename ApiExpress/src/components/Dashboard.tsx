@@ -24,6 +24,7 @@ import { useUser } from '../context/UserContext';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import Tooltip from '@mui/material/Tooltip';
 import { Zoom } from '@mui/material';
+import { useMediaQuery } from '@mui/material';
 
 interface DemoPageContentProps {
   pathname: string;
@@ -157,7 +158,11 @@ function DemoPageContent({ pathname }: DemoPageContentProps) {
   );
 }
 
-function SidebarFooterAccount() {
+interface SidebarFooterAccountProps {
+  mini: boolean; 
+}
+
+function SidebarFooterAccount({ mini }: SidebarFooterAccountProps) {
   const { user } = useUser();
 
   if (!user) {
@@ -175,25 +180,45 @@ function SidebarFooterAccount() {
       console.error('Error al cerrar sesión:', error);
       alert('Hubo un problema al cerrar sesión. Inténtalo de nuevo.');
     }
-  };  
+  };
 
   return (
     <Stack direction="column">
-      <Typography variant="body2" mx={2} mt={1}>
-        Cuenta
-      </Typography>
+      {!mini && (
+        <Typography
+          variant="body2"
+          mx={2}
+          mt={1}
+          sx={{
+            transition: 'opacity 0.3s ease',
+            opacity: mini ? 0 : 1,
+          }}
+        >
+          Cuenta
+        </Typography>
+      )}
+
       <MenuList>
         <Box
-          key={user._id}
           sx={{
             width: '100%',
             display: 'flex',
+            flexDirection: mini ? 'column' : 'row',
             alignItems: 'center',
             columnGap: 2,
             padding: '8px 16px',
+            transition: 'flex-direction 1s ease, margin-bottom 1s ease',
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', columnGap: 2 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              columnGap: 2,
+              marginBottom: mini ? '12px' : '0', 
+              transition: 'margin-bottom 0.3s ease',
+            }}
+          >
             <ListItemIcon sx={{ minWidth: 0 }}>
               <Avatar
                 sx={{
@@ -207,10 +232,12 @@ function SidebarFooterAccount() {
                 {user.nombre ? user.nombre[0] : 'U'}
               </Avatar>
             </ListItemIcon>
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography variant="body2">{user.nombre}</Typography>
-              <Typography variant="caption">{user.email}</Typography>
-            </Box>
+            {!mini && (
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography variant="body2">{user.nombre}</Typography>
+                <Typography variant="caption">{user.email}</Typography>
+              </Box>
+            )}
           </Box>
 
           <Box
@@ -221,7 +248,7 @@ function SidebarFooterAccount() {
               marginLeft: 'auto',
               width: '100%',
             }}
-          >            
+          >
             <Tooltip title="Logout" TransitionComponent={Zoom} arrow>
               <ListItemIcon sx={{ cursor: 'pointer', minWidth: 0 }} onClick={handleLogout}>
                 <ExitToAppIcon sx={{ color: 'white' }} />
