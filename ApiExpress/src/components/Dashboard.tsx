@@ -16,44 +16,21 @@ import HotelSharp from '@mui/icons-material/HotelSharp';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import {
-  Account,
-  AccountPreview,
-  AccountPopoverFooter,
-  SignOutButton,
-} from '@toolpad/core/Account';
-import type { Router, Navigate } from '@toolpad/core/AppProvider';
 import Reservas from './Reservas';
 import Hoteles from './Hoteles';
 import { HomeRepairServiceSharp } from '@mui/icons-material';
 import Configuraciones from './Configuraciones';
+import { useUser } from '../context/UserContext'; 
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import Tooltip from '@mui/material/Tooltip';
+import { Zoom } from '@mui/material';
+
 interface DemoPageContentProps {
   pathname: string;
 }
 
-interface SidebarFooterAccountProps {
-  mini: boolean;
-}
-
 interface DashboardLayoutProps {
   window?: () => Window;
-}
-
-interface Account {
-  id: number;
-  name: string;
-  email: string;
-  image?: string;
-  color?: string;
-  projects: { id: number; title: string; }[];
-}
-
-interface Session {
-  user: {
-    name: string;
-    email: string;
-    image: string;
-  };
 }
 
 const NAVIGATION = [
@@ -180,177 +157,90 @@ function DemoPageContent({ pathname }: DemoPageContentProps) {
   );
 }
 
-const accounts: Account[] = [
-  {
-    id: 1,
-    name: 'Bharat Kashyap',
-    email: 'bharatkashyap@outlook.com',
-    image: 'https://avatars.githubusercontent.com/u/19550456',
-    projects: [
-      {
-        id: 3,
-        title: 'Project X',
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Bharat MUI',
-    email: 'bharat@mui.com',
-    color: '#8B4513',
-    projects: [{ id: 4, title: 'Project A' }],
-  },
-];
+function SidebarFooterAccount() {
+  const { user } = useUser();
 
-function SidebarFooterAccountPopover() {
+  if (!user) {
+    return null;
+  }
+
+  const handleLogout = () => {
+    alert("Has cerrado sesión.");
+  };
+
   return (
     <Stack direction="column">
       <Typography variant="body2" mx={2} mt={1}>
-        Accounts
+        Cuenta
       </Typography>
       <MenuList>
-        {accounts.map((account) => (
-          <MenuItem
-            key={account.id}
-            component="button"
-            sx={{
-              justifyContent: 'flex-start',
-              width: '100%',
-              columnGap: 2,
-            }}
-          >
-            <ListItemIcon>
+        <Box
+          key={user._id}
+          sx={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            columnGap: 2,
+            padding: '8px 16px',
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', columnGap: 2 }}>
+            <ListItemIcon sx={{ minWidth: 0 }}>
               <Avatar
                 sx={{
                   width: 32,
                   height: 32,
                   fontSize: '0.95rem',
-                  bgcolor: account.color,
                 }}
-                src={account.image ?? ''}
-                alt={account.name ?? ''}
+                src={user.profilePicture || ''}
+                alt={user.nombre || ''}
               >
-                {account.name[0]}
+                {user.nombre ? user.nombre[0] : 'U'}
               </Avatar>
             </ListItemIcon>
-            <ListItemText
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                width: '100%',
-              }}
-              primary={account.name}
-              secondary={account.email}
-              primaryTypographyProps={{ variant: 'body2' }}
-              secondaryTypographyProps={{ variant: 'caption' }}
-            />
-          </MenuItem>
-        ))}
-      </MenuList>
-      <Divider />
-      <AccountPopoverFooter>
-        <Stack direction="column">
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography variant="body2">{user.nombre}</Typography>
+              <Typography variant="caption">{user.email}</Typography>
+            </Box>
+          </Box>
 
-          <SignOutButton />
-        </Stack>
-      </AccountPopoverFooter>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginLeft: 'auto',
+              width: '100%',
+            }}
+          >            
+            <Tooltip title="Logout" TransitionComponent={Zoom} arrow>
+              <ListItemIcon sx={{ cursor: 'pointer', minWidth: 0 }} onClick={handleLogout}>
+                <ExitToAppIcon sx={{ color: 'white' }} />
+              </ListItemIcon>
+            </Tooltip>
+          </Box>
+        </Box>
+      </MenuList>
     </Stack>
   );
 }
-
-const createPreviewComponent = (mini: boolean) => {
-  return function PreviewComponent(props: React.ComponentProps<typeof AccountPreview>) {
-    return (
-      <Stack direction="column" p={0}>
-        <Divider />
-        <AccountPreview
-          {...props}
-          variant={mini ? 'condensed' : 'expanded'}
-        />
-      </Stack>
-    )
-  };
-};
-
-function SidebarFooterAccount({ mini }: SidebarFooterAccountProps) {
-  const PreviewComponent = React.useMemo(() => createPreviewComponent(mini), [mini]);
-  return (
-    <Account
-      slots={{
-        preview: PreviewComponent,
-        popoverContent: SidebarFooterAccountPopover,
-      }}
-      slotProps={{
-        popover: {
-          transformOrigin: { horizontal: 'left', vertical: 'bottom' },
-          anchorOrigin: { horizontal: 'right', vertical: 'bottom' },
-          disableAutoFocus: true,
-          slotProps: {
-            paper: {
-              elevation: 0,
-              sx: {
-                overflow: 'visible',
-                filter: (theme) =>
-                  `drop-shadow(0px 2px 8px ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.32)'})`,
-                mt: 1,
-                '&::before': {
-                  content: '""',
-                  display: 'block',
-                  position: 'absolute',
-                  bottom: 10,
-                  left: 0,
-                  width: 10,
-                  height: 10,
-                  bgcolor: 'background.paper',
-                  transform: 'translate(-50%, -50%) rotate(45deg)',
-                  zIndex: 0,
-                },
-              },
-            },
-          },
-        },
-      }}
-    />
-  );
-}
-
-const demoSession: Session = {
-  user: {
-    name: 'Bharat Kashyap',
-    email: 'bharatkashyap@outlook.com',
-    image: 'https://avatars.githubusercontent.com/u/19550456',
-  },
-};
 
 function DashboardLayoutAccountSidebar(props: DashboardLayoutProps) {
   const { window } = props;
   const [pathname, setPathname] = React.useState('/dashboard');
 
-  const router = React.useMemo<Router>(() => {
+  const router = React.useMemo(() => {
     return {
       pathname,
       searchParams: new URLSearchParams(),
       navigate: ((url: string | URL) => {
         const path = typeof url === 'string' ? url : url.pathname;
         setPathname(path.startsWith('/') ? path : `/${path}`);
-      }) as Navigate,
+      }),
     };
   }, [pathname]);
 
   const demoWindow = window !== undefined ? window() : undefined;
-
-  const [session, setSession] = React.useState<Session | null>(demoSession);
-  const authentication = React.useMemo(() => {
-    return {
-      signIn: () => {
-        setSession(demoSession);
-      },
-      signOut: () => {
-        setSession(null);
-      },
-    };
-  }, []);
 
   return (
     <ThemeProvider theme={demoTheme}>
@@ -360,8 +250,13 @@ function DashboardLayoutAccountSidebar(props: DashboardLayoutProps) {
         router={router}
         theme={demoTheme}
         window={demoWindow}
-        authentication={authentication}
-        session={session}
+        session={{
+          user: {
+            name: 'John Doe',
+            email: 'john.doe@example.com',
+            image: 'https://picsum.photos/500?random=65f601a456b789c601d456e6',
+          }          
+        }}
       >
         <DashboardLayout
           slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
