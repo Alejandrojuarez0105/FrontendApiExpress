@@ -4,6 +4,93 @@ import LoginForm from "./components/LoginForm";
 import Dashboard from "./components/Dashboard";
 import { useUser } from "./context/UserContext";
 import { UserProvider } from "./context/UserContext";
+import { ReservationProvider } from "./context/ReservationContext";
+import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
+
+// Definir el tema oscuro global
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    background: {
+      default: '#121212',
+      paper: '#1E1E1E',
+    },
+    primary: {
+      main: '#90caf9',
+    },
+    secondary: {
+      main: '#ce93d8',
+    },
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          backgroundColor: '#121212',
+          color: '#fff',
+          minHeight: '100vh',
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#1E1E1E',
+        },
+      },
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: '#1E1E1E',
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#1E1E1E',
+          color: '#fff',
+          border: '1px solid #333',
+        },
+      },
+    },
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#333',
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#1E1E1E',
+          color: '#fff',
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          color: '#fff',
+        },
+        input: {
+          color: '#fff',
+        },
+      },
+    },
+  },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 600,
+      lg: 1200,
+      xl: 1536,
+    },
+  },
+});
 
 const API_URL = "http://localhost:3000/api/auth/validate-token";
 
@@ -66,11 +153,16 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <UserProvider>
-      <div className="App">
-        <AppContent />
-      </div>
-    </UserProvider>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <UserProvider>
+        <ReservationProvider>
+          <div className="App">
+            <AppContent />
+          </div>
+        </ReservationProvider>
+      </UserProvider>
+    </ThemeProvider>
   );
 };
 

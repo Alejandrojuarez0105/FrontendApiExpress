@@ -16,7 +16,6 @@ import HotelSharp from '@mui/icons-material/HotelSharp';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import Reservas from './Reservas';
 import Hoteles from './Hoteles';
 import { HomeRepairServiceSharp } from '@mui/icons-material';
 import Configuraciones from './Configuraciones';
@@ -24,6 +23,7 @@ import { useUser } from '../context/UserContext';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import Tooltip from '@mui/material/Tooltip';
 import { Zoom } from '@mui/material';
+import Reservas from './Reservas';
 
 interface DemoPageContentProps {
   pathname: string;
@@ -130,7 +130,7 @@ function DemoPageContent({ pathname }: DemoPageContentProps) {
       case '/hoteles':
         return <Hoteles />;
       case '/reservas':
-        return <Reservas />;
+        return <Reservas />
       case '/configuraciones':
         return <Configuraciones />;
       default:
@@ -278,20 +278,11 @@ function DashboardLayoutAccountSidebar(props: DashboardLayoutProps) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    <ThemeProvider theme={demoTheme}>
-      <CssBaseline />
       <AppProvider
         navigation={NAVIGATION}
         router={router}
         theme={demoTheme}
         window={demoWindow}
-        session={{
-          user: {
-            name: 'John Doe',
-            email: 'john.doe@example.com',
-            image: 'https://picsum.photos/500?random=65f601a456b789c601d456e6',
-          }          
-        }}
       >
         <DashboardLayout
           slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
@@ -299,15 +290,10 @@ function DashboardLayoutAccountSidebar(props: DashboardLayoutProps) {
           <DemoPageContent pathname={pathname} />
         </DashboardLayout>
       </AppProvider>
-    </ThemeProvider>
   );
 }
 
 DashboardLayoutAccountSidebar.propTypes = {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * Remove this when copying and pasting into your project.
-   */
   window: PropTypes.func,
 };
 

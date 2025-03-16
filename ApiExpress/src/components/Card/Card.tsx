@@ -1,9 +1,18 @@
 import React, { useState } from "react";
+import { Card as MuiCard, CardContent, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, Rating, Box, Chip } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import "./Card.css";
 
-interface CardProps {
+// Interfaz base que comparten todos los tipos de card
+interface BaseCardProps {
+  type: 'hotel' | 'reserva';
   title: string;
   description: string;
+}
+
+// Interfaz específica para hoteles
+interface HotelCardProps extends BaseCardProps {
+  type: 'hotel';
   direccion: string;
   estrellas: number;
   email: string;
@@ -11,47 +20,262 @@ interface CardProps {
   servicios: string[];
 }
 
-const Card: React.FC<CardProps> = ({
-  title,
-  description,
-  direccion,
-  estrellas,
-  email,
-  telefono,
-  servicios,
-}) => {
+// Interfaz específica para reservas
+interface ReservaCardProps extends BaseCardProps {
+  type: 'reserva';
+  fechaInicio: string;
+  fechaFin: string;
+  estado: string;
+  precio: number;
+  numeroPersonas: number;
+  hotel: {
+    nombre: string;
+    direccion: string;
+  };
+}
+
+// Tipo de unión para aceptar cualquiera de los dos tipos
+type CardProps = HotelCardProps | ReservaCardProps;
+
+const Card: React.FC<CardProps> = (props) => {
   const [showDetails, setShowDetails] = useState(false);
+  const theme = useTheme();
 
   const toggleDetails = () => {
     setShowDetails(!showDetails);
   };
 
-  return (
-    <div className="card">
-      <h3 className="card-title">{title}</h3>
-      <p className="card-description">{description}</p>
-      <p><strong>Dirección:</strong> {direccion}</p>
-      <p className="card-estrellas">{"⭐".repeat(estrellas)}</p>
-
-      <button className="card-button" onClick={toggleDetails}>
-        {showDetails ? "Cerrar Detalles" : "Detalles"}
-      </button>
-
-      {showDetails && (
-        <div className="card-overlay" onClick={toggleDetails}>
-          <div className="card-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="card-close" onClick={toggleDetails}>X</button>
-            <h4>{title}</h4>
-            <p><strong>Descripción:</strong> {description}</p>
-            <p><strong>Dirección:</strong> {direccion}</p>
-            <p><strong>Teléfono:</strong> {telefono}</p>
-            <p><strong>Email:</strong> {email}</p>
-            <p><strong>Estrellas:</strong> {"⭐".repeat(estrellas)}</p>
-            <p><strong>Servicios:</strong> {servicios.join(", ")}</p>
-          </div>
+  // Contenido específico según el tipo
+  const renderCardContent = () => {
+    if (props.type === 'hotel') {
+      return (
+        <div>
+          <Typography 
+            variant="h5" 
+            component="div" 
+            gutterBottom
+            sx={{
+              height: 60,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical'
+            }}
+          >
+            {props.title}
+          </Typography>
+          
+          <Typography 
+            variant="body2" 
+            color="text.secondary" 
+            gutterBottom
+            sx={{ 
+              height: 80, 
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical'
+            }}
+          >
+            {props.description}
+          </Typography>
+          
+          <Typography 
+            variant="body2"
+            sx={{ 
+              mb: 1,
+              height: 24,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <strong>Dirección:</strong> {props.direccion}
+          </Typography>
+          
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Rating value={props.estrellas} readOnly size="small" />
+          </Box>
         </div>
-      )}
-    </div>
+      );
+    } else if (props.type === 'reserva') {
+      return (
+        <div>
+          <Typography 
+            variant="h5" 
+            component="div" 
+            gutterBottom
+            sx={{
+              height: 60,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical'
+            }}
+          >
+            {props.title}
+          </Typography>
+          
+          <Typography 
+            variant="body2" 
+            color="text.secondary" 
+            gutterBottom
+            sx={{ 
+              height: 40, 
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical'
+            }}
+          >
+            {props.description}
+          </Typography>
+          
+          <Box sx={{ mb: 1 }}>
+            <Typography variant="body2" sx={{ mb: 0.5 }}>
+              <strong>Hotel:</strong> {props.hotel.nombre}
+            </Typography>
+            
+            <Typography variant="body2" sx={{ mb: 0.5 }}>
+              <strong>Período:</strong> {new Date(props.fechaInicio).toLocaleDateString()} - {new Date(props.fechaFin).toLocaleDateString()}
+            </Typography>
+            
+            <Typography variant="body2" sx={{ mb: 0.5 }}>
+              <strong>Personas:</strong> {props.numeroPersonas}
+            </Typography>
+          </Box>
+          
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+            <Chip 
+              label={props.estado} 
+              color={
+                props.estado === 'Confirmada' ? 'success' : 
+                props.estado === 'Pendiente' ? 'warning' : 
+                props.estado === 'Cancelada' ? 'error' : 'default'
+              }
+              size="small"
+            />
+            <Typography variant="h6" color="primary">
+              ${props.precio}
+            </Typography>
+          </Box>
+        </div>
+      );
+    }
+    
+    return null;
+  };
+
+  // Contenido del diálogo según el tipo
+  const renderDialogContent = () => {
+    if (props.type === 'hotel') {
+      return (
+        <>
+          <DialogTitle>{props.title}</DialogTitle>
+          <DialogContent dividers>
+            <Typography variant="body1" gutterBottom>
+              <strong>Descripción:</strong> {props.description}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>Dirección:</strong> {props.direccion}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>Teléfono:</strong> {props.telefono}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>Email:</strong> {props.email}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>Estrellas:</strong> <Rating value={props.estrellas} readOnly />
+            </Typography>
+            <Typography variant="body1">
+              <strong>Servicios:</strong> {props.servicios.join(", ")}
+            </Typography>
+          </DialogContent>
+        </>
+      );
+    } else if (props.type === 'reserva') {
+      return (
+        <>
+          <DialogTitle>{props.title}</DialogTitle>
+          <DialogContent dividers>
+            <Typography variant="body1" gutterBottom>
+              <strong>Descripción:</strong> {props.description}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>Hotel:</strong> {props.hotel.nombre}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>Dirección del hotel:</strong> {props.hotel.direccion}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>Fecha de inicio:</strong> {new Date(props.fechaInicio).toLocaleDateString()}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>Fecha de fin:</strong> {new Date(props.fechaFin).toLocaleDateString()}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>Número de personas:</strong> {props.numeroPersonas}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>Estado:</strong> {props.estado}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>Precio total:</strong> ${props.precio}
+            </Typography>
+          </DialogContent>
+        </>
+      );
+    }
+    
+    return null;
+  };
+
+  return (
+    <MuiCard 
+      sx={{ 
+        margin: 2, 
+        backgroundColor: theme.palette.background.paper, 
+        color: theme.palette.text.primary,
+        height: 350,
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between'
+      }}
+    >
+      <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        {renderCardContent()}
+
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={toggleDetails}
+          sx={{ mt: 'auto' }}
+          fullWidth
+        >
+          Detalles
+        </Button>
+
+        <Dialog
+          open={showDetails}
+          onClose={toggleDetails}
+          maxWidth="sm"
+          fullWidth
+        >
+          {renderDialogContent()}
+          <DialogActions>
+            <Button onClick={toggleDetails} color="primary">
+              Cerrar
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </CardContent>
+    </MuiCard>
   );
 };
 

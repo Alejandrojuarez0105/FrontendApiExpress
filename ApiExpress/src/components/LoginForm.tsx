@@ -1,5 +1,21 @@
 import React, { useState } from 'react';
 import { useUser } from '../context/UserContext';
+import { 
+  Box, 
+  TextField, 
+  Button, 
+  Typography, 
+  Paper, 
+  InputAdornment, 
+  IconButton,
+  CircularProgress,
+  Alert,
+  Container,
+  CssBaseline
+} from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 const LoginForm: React.FC = () => {
   const { setUserId, setUser } = useUser();
@@ -8,6 +24,7 @@ const LoginForm: React.FC = () => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const theme = useTheme();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,53 +60,106 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center min-vh-100">
-      <div className="login-form p-5 shadow">
-        <h1 className="text-center mb-4">Login</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label htmlFor="email" className="form-label">Email:</label>
-            <input
-              id="user"
-              className="form-control"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="password" className="form-label">Password:</label>
-            <div className="position-relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
+    <>
+      <CssBaseline />
+      <Box 
+        sx={{ 
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+          width: '100%',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: theme.palette.background.default,
+          overflow: 'hidden'
+        }}
+      >
+        <Container maxWidth="xs">
+          <Paper 
+            elevation={3} 
+            sx={{ 
+              padding: 4, 
+              borderRadius: 2,
+              backgroundColor: theme.palette.background.paper,
+              color: theme.palette.text.primary
+            }}
+          >
+            <Typography variant="h4" component="h1" align="center" gutterBottom>
+              Login
+            </Typography>
+            
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Email"
+                name="email"
+                autoComplete="email"
+                autoFocus
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                sx={{ mb: 2 }}
+                InputProps={{
+                  style: { color: theme.palette.text.primary }
+                }}
+              />
+              
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Contraseña"
                 id="password"
-                className="form-control"
+                autoComplete="current-password"
+                type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
+                InputProps={{
+                  style: { color: theme.palette.text.primary },
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                        color="primary"
+                      >
+                        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
               />
-              <span
-                className="position-absolute top-50 end-0 translate-middle-y pe-3"
-                style={{ cursor: 'pointer' }}
-                onClick={() => setShowPassword(!showPassword)}
+              
+              {error && (
+                <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
+              
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                disabled={isLoading}
+                sx={{ mt: 3, mb: 2, py: 1.5 }}
               >
-                {showPassword ? '🙈' : '👁️'}
-              </span>
-            </div>
-          </div>
-          {error && <div className="text-danger text-center mb-3">{error}</div>}
-          {isLoading ? (
-            <div className="d-flex justify-content-center mb-3">
-              <div className="spinner-border" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </div>
-            </div>
-          ) : (
-            <button type="submit" className="btn btn-success w-100 mt-3">Log In</button>
-          )}
-        </form>
-      </div>
-    </div>
+                {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Iniciar sesión'}
+              </Button>
+            </Box>
+          </Paper>
+        </Container>
+      </Box>
+    </>
   );
 };
 
