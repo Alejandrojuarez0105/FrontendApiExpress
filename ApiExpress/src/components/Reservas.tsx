@@ -89,10 +89,30 @@ const Reservas: React.FC = () => {
         pb: 5
       }}
     >
-      <Container maxWidth="lg" sx={{ mt: 2, mb: 5 }}>
-        <Typography variant="h4" align="center" mb={5} color="text.primary">
-          Mis Reservas
-        </Typography>
+      <Container maxWidth="xl" sx={{ mt: 2, mb: 5 }}>
+      <Paper 
+            elevation={3} 
+            sx={{ 
+              p: 2, 
+              mb: 4,
+              backgroundColor: theme.palette.background.default,
+              boxShadow: `0 4px 20px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)`,
+              borderRadius: 1
+            }}
+          >
+            <Typography 
+              variant="h4" 
+              align="center"
+              color="primary"
+              sx={{
+                fontWeight: 'bold',
+                letterSpacing: '0.5px',
+                textShadow: '1px 1px 3px rgba(0,0,0,0.3)'
+              }}
+            >
+                Mis Reservas
+            </Typography>
+          </Paper>
 
         {reservasMapeadas.length > 0 ? (
           <Grid container spacing={3}>
@@ -119,7 +139,7 @@ const Reservas: React.FC = () => {
           </Grid>
         ) : (
           <Paper 
-            elevation={2} 
+            elevation={3} 
             sx={{ 
               p: 3, 
               backgroundColor: theme.palette.background.paper,

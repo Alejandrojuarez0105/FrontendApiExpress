@@ -5,6 +5,7 @@ import Dashboard from "./components/Dashboard";
 import { useUser } from "./context/UserContext";
 import { UserProvider } from "./context/UserContext";
 import { ReservationProvider } from "./context/ReservationContext";
+import { HotelProvider } from "./context/HotelContext";
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 
 // Definir el tema oscuro global
@@ -156,11 +157,13 @@ const App: React.FC = () => {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <UserProvider>
-        <ReservationProvider>
-          <div className="App">
-            <AppContent />
-          </div>
-        </ReservationProvider>
+        <HotelProvider>
+          <ReservationProvider>
+            <div className="App">
+              <AppContent />
+            </div>
+          </ReservationProvider>
+        </HotelProvider>
       </UserProvider>
     </ThemeProvider>
   );

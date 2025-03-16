@@ -24,6 +24,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import Tooltip from '@mui/material/Tooltip';
 import { Zoom } from '@mui/material';
 import Reservas from './Reservas';
+import AddReservas from './AddReservas';
 
 interface DemoPageContentProps {
   pathname: string;
@@ -166,6 +167,27 @@ function DemoPageContent({ pathname }: DemoPageContentProps) {
             </Box>
           );
         }
+        case '/reservas/crear-reserva':
+          console.log('Renderizando Reservas');
+          try {
+            return <AddReservas />;
+          } catch (error) {
+            console.error('Error al renderizar Reservas:', error);
+            return (
+              <Box
+                sx={{
+                  py: 4,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  textAlign: 'center',
+                }}
+              >
+                <Typography color="error">Error al cargar Reservas</Typography>
+                <Typography variant="body2">{String(error)}</Typography>
+              </Box>
+            );
+          }
       case '/configuraciones':
         console.log('Renderizando Configuraciones');
         return <Configuraciones />;
