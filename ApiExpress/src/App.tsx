@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Route, Routes, Navigate } from "react-router-dom";
-import Configuraciones from "./components/Configuraciones";
-import Hoteles from "./components/Hoteles";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import LoginForm from "./components/LoginForm";
-import Reservas from "./components/Reservas";
 import Dashboard from "./components/Dashboard";
 import { useUser } from "./context/UserContext";
 import { UserProvider } from "./context/UserContext";
@@ -13,6 +10,7 @@ const API_URL = "http://localhost:3000/api/auth/validate-token";
 const AppContent: React.FC = () => {
   const { setUserId, setUser } = useUser();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const location = useLocation();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -39,9 +37,11 @@ const AppContent: React.FC = () => {
 
     checkAuth();
 
-    const interval = setInterval(checkAuth, 900000);
-    return () => clearInterval(interval);
-  }, []);
+    if (location.pathname !== "/") {
+      const interval = setInterval(checkAuth, 900000);
+      return () => clearInterval(interval);
+    }
+  }, [location.pathname]);
 
   if (isAuthenticated === null) {
     return <p>Cargando...</p>;
@@ -56,9 +56,6 @@ const AppContent: React.FC = () => {
       {isAuthenticated ? (
         <>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/reservas" element={<Reservas />} />
-          <Route path="/hoteles" element={<Hoteles />} />
-          <Route path="/configuraciones" element={<Configuraciones />} />
         </>
       ) : (
         <Route path="*" element={<Navigate to="/" replace />} />
