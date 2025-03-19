@@ -174,6 +174,59 @@ const Card: React.FC<CardProps> = (props) => {
           </Box>
         </div>
       );
+    }else if (props.type === 'room'){
+      return (
+        <div>
+          <Typography 
+            variant="h5" 
+            component="div" 
+            gutterBottom
+            sx={{
+              height: 60,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical'
+            }}
+          >
+            {props.title}
+          </Typography>
+          
+          <Typography 
+            variant="body2" 
+            color="text.secondary" 
+            gutterBottom
+            sx={{ 
+              height: 80, 
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical'
+            }}
+          >
+            {props.description}
+          </Typography>
+          
+          <Typography 
+            variant="body2"
+            sx={{ 
+              mb: 1,
+              height: 24,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <strong>Cuarto:</strong> {props.tipo}
+          </Typography>
+          
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <p /*value={props.capacidad}*/ >{props.capacidad}</p>
+          </Box>
+        </div>
+      );
     }
     
     return null;
