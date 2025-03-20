@@ -198,7 +198,7 @@ const Card: React.FC<CardProps> = (props) => {
             color="text.secondary" 
             gutterBottom
             sx={{ 
-              height: 80, 
+              height: 60, 
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               display: '-webkit-box',
@@ -221,10 +221,30 @@ const Card: React.FC<CardProps> = (props) => {
           >
             <strong>Cuarto:</strong> {props.tipo}
           </Typography>
-          
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <p /*value={props.capacidad}*/ >{props.capacidad}</p>
-          </Box>
+
+          <Typography 
+          variant="body2"
+          sx={{ 
+            mb: 1,
+            height: 24,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+            }}>
+            <strong>Capacidad:</strong> {props.capacidad}
+          </Typography>
+
+          <Typography 
+          variant="body1"
+          sx={{ 
+            mb: 1,
+            height: 24,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+            }}>
+            <strong>Disponibilidad:</strong> {'Perhaps'}
+          </Typography>
         </div>
       );
     }
@@ -310,7 +330,7 @@ const Card: React.FC<CardProps> = (props) => {
               <strong>Precio por noche:</strong> {props.precio_por_noche}
             </Typography>
             <Typography variant="body1" gutterBottom>
-              <strong>Disponible:</strong> {props.disponibilidad}
+              <strong>Disponible:</strong> {props.disponibilidad ? 'Disponible' : 'No disponible'}
             </Typography>
           </DialogContent>
         </>

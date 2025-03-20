@@ -125,7 +125,7 @@ const Cuartos: React.FC = () => {
             }}
           >
             <Typography variant="h6" align="center">
-              No se encontraron hoteles
+              No se encontraron cuartos
             </Typography>
           </Paper>
         )}
