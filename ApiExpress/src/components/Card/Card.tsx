@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Card as MuiCard, CardContent, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, Rating, Box, Chip } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import "./Card.css";
-import { green } from "@mui/material/colors";
 
 // Interfaz base que comparten todos los tipos de card
 interface BaseCardProps {
@@ -235,20 +234,17 @@ const Card: React.FC<CardProps> = (props) => {
             <strong>Capacidad:</strong> {props.capacidad}
           </Typography>
 
-          <button
-          type='button'
-          style={{
-            height: 'stretch',
-            maxHeight: 'stretch',
-            backgroundColor: props.disponibilidad ? 'green' : 'red',
-            borderRadius: 5,
-            paddingTop: 10,
-            paddingBottom: 10
+          <Typography
+          sx={{
+            mb: 1,
+            height: 24,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
           }}  
-          onClick={() => console.log('Algo para la reserva')}
           >
             <strong>{props.disponibilidad ? 'Cuarto disponible, reserva ya' : 'Cuarto no disponible'}</strong>
-          </button>
+          </Typography>
         </div>
       );
     }
