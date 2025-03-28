@@ -157,13 +157,11 @@ const App: React.FC = () => {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <UserProvider>
-        <HotelProvider>
           <ReservationProvider>
             <div className="App">
               <AppContent />
             </div>
           </ReservationProvider>
-        </HotelProvider>
       </UserProvider>
     </ThemeProvider>
   );

@@ -25,6 +25,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { Zoom } from '@mui/material';
 import Reservas from './Reservas';
 import AddReservas from './AddReservas';
+import PaymentIcon from '@mui/icons-material/Payment';
 
 interface DemoPageContentProps {
   pathname: string;
@@ -65,6 +66,11 @@ const NAVIGATION = [
     segment: 'hoteles',
     title: 'Hoteles',
     icon: <HotelSharp />,
+  },
+  {
+    segment: 'payments',
+    title: 'Pagos',
+    icon: <PaymentIcon />,
   },
   {
     segment: 'configuraciones',
