@@ -156,11 +156,9 @@ const AddReservas: React.FC = () => {
     try {
       setSubmitting(true);
       
-      // Encontrar el tipo de habitación seleccionado
       const selectedTipoHabitacion = tiposHabitacion.find(t => t._id === formData.tipoHabitacionId);
       const selectedHotel = hotels.find(h => h._id === formData.hotelId);
       
-      // Calcular el número de noches
       const fechaInicio = formData.fechaInicio ? new Date(formData.fechaInicio) : null;
       const fechaFin = formData.fechaFin ? new Date(formData.fechaFin) : null;
       
@@ -192,17 +190,14 @@ const AddReservas: React.FC = () => {
         credentials: 'include'
       });
       
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Error al crear la reserva');
+        throw new Error(data.message);
       }
       
-      const data = await response.json();
-      console.log('Reserva creada:', data);
-      
-      // Refrescar las reservas para que la nueva aparezca en la lista
       await refreshReservations();
       
-      // Mostrar notificación de éxito
       setNotification({
         open: true,
         message: '¡Reserva creada con éxito!',
