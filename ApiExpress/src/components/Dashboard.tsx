@@ -28,6 +28,7 @@ import AddReservas from './AddReservas';
 import PaymentIcon from '@mui/icons-material/Payment';
 import { title } from 'process';
 import Cuarto from './Cuartos';
+import Payment from './Payment';
 
 interface DemoPageContentProps {
   pathname: string;
@@ -206,6 +207,8 @@ function DemoPageContent({ pathname }: DemoPageContentProps) {
         return <Configuraciones />;
       case '/rooms':
         return <Cuarto />;
+      case '/payments':
+        return <Payment />;
       default:
         console.log('Ruta no encontrada:', pathname);
         return (

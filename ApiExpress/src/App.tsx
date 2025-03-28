@@ -8,6 +8,7 @@ import { ReservationProvider } from "./context/ReservationContext";
 import { HotelProvider } from "./context/HotelContext";
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 import { RoomProvider } from "./context/RoomsContext";
+import { PaymentProvider } from "./context/PaymentContext";
 
 // Definir el tema oscuro global
 const darkTheme = createTheme({
@@ -159,11 +160,13 @@ const App: React.FC = () => {
       <CssBaseline />
       <UserProvider>
         <HotelProvider>
+          <PaymentProvider>
             <ReservationProvider>
               <div className="App">
                 <AppContent />
               </div>
             </ReservationProvider>
+          </PaymentProvider>
         </HotelProvider>
       </UserProvider>
     </ThemeProvider>
