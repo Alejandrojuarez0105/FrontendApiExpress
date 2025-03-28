@@ -159,13 +159,11 @@ const App: React.FC = () => {
       <CssBaseline />
       <UserProvider>
         <HotelProvider>
-          <RoomProvider>
             <ReservationProvider>
               <div className="App">
                 <AppContent />
               </div>
             </ReservationProvider>
-          </RoomProvider>
         </HotelProvider>
       </UserProvider>
     </ThemeProvider>
