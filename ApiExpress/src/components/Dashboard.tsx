@@ -17,7 +17,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import Hoteles from './Hoteles';
-import { HomeRepairServiceSharp } from '@mui/icons-material';
+import { HomeRepairServiceSharp, KingBed, KingBedSharp } from '@mui/icons-material';
 import Configuraciones from './Configuraciones';
 import { useUser } from '../context/UserContext'; 
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
@@ -25,6 +25,8 @@ import Tooltip from '@mui/material/Tooltip';
 import { Zoom } from '@mui/material';
 import Reservas from './Reservas';
 import AddReservas from './AddReservas';
+import { title } from 'process';
+import Cuarto from './Cuartos';
 
 interface DemoPageContentProps {
   pathname: string;
@@ -65,6 +67,11 @@ const NAVIGATION = [
     segment: 'hoteles',
     title: 'Hoteles',
     icon: <HotelSharp />,
+  },
+  {
+    segment: 'rooms',
+    title: 'Cuartos',
+    icon: <KingBedSharp />
   },
   {
     segment: 'configuraciones',
@@ -191,6 +198,8 @@ function DemoPageContent({ pathname }: DemoPageContentProps) {
       case '/configuraciones':
         console.log('Renderizando Configuraciones');
         return <Configuraciones />;
+      case '/rooms':
+        return <Cuarto />;
       default:
         console.log('Ruta no encontrada:', pathname);
         return (

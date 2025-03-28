@@ -5,7 +5,7 @@ import "./Card.css";
 
 // Interfaz base que comparten todos los tipos de card
 interface BaseCardProps {
-  type: 'hotel' | 'reserva';
+  type: 'hotel' | 'reserva' | 'room';
   title: string;
   description: string;
 }
@@ -34,8 +34,17 @@ interface ReservaCardProps extends BaseCardProps {
   };
 }
 
-// Tipo de unión para aceptar cualquiera de los dos tipos
-type CardProps = HotelCardProps | ReservaCardProps;
+interface RoomCardProps extends BaseCardProps{
+  type: 'room';
+  hotel_id: string;
+  tipo: string;
+  capacidad: number;
+  precio_por_noche: number;
+  disponibilidad: boolean;
+}
+
+// Tipo de unión para aceptar cualquiera de los tipos
+type CardProps = HotelCardProps | ReservaCardProps | RoomCardProps;
 
 const Card: React.FC<CardProps> = (props) => {
   const [showDetails, setShowDetails] = useState(false);
@@ -165,6 +174,79 @@ const Card: React.FC<CardProps> = (props) => {
           </Box>
         </div>
       );
+    }else if (props.type === 'room'){
+      return (
+        <div>
+          <Typography 
+            variant="h5" 
+            component="div" 
+            gutterBottom
+            sx={{
+              height: 60,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical'
+            }}
+          >
+            {props.title}
+          </Typography>
+          
+          <Typography 
+            variant="body2" 
+            color="text.secondary" 
+            gutterBottom
+            sx={{ 
+              height: 60, 
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical'
+            }}
+          >
+            {props.description}
+          </Typography>
+          
+          <Typography 
+            variant="body2"
+            sx={{ 
+              mb: 1,
+              height: 24,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <strong>Cuarto:</strong> {props.tipo}
+          </Typography>
+
+          <Typography 
+          variant="body2"
+          sx={{ 
+            mb: 1,
+            height: 24,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+            }}>
+            <strong>Capacidad:</strong> {props.capacidad}
+          </Typography>
+
+          <Typography
+          sx={{
+            mb: 1,
+            height: 24,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}  
+          >
+            <strong>{props.disponibilidad ? 'Cuarto disponible, reserva ya' : 'Cuarto no disponible'}</strong>
+          </Typography>
+        </div>
+      );
     }
     
     return null;
@@ -226,6 +308,29 @@ const Card: React.FC<CardProps> = (props) => {
             </Typography>
             <Typography variant="body1" gutterBottom>
               <strong>Precio total:</strong> ${props.precio}
+            </Typography>
+          </DialogContent>
+        </>
+      );
+    }else if (props.type === 'room'){
+      return(
+        <>
+        <DialogTitle>{props.title}</DialogTitle>
+          <DialogContent dividers>
+            <Typography variant="body1" gutterBottom>
+              <strong>Tipo de cuarto:</strong> {props.tipo}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>Descripcion:</strong> {'Cuarto de tipo: ' + props.tipo}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>Capacidad:</strong> {props.capacidad}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>Precio por noche:</strong> {props.precio_por_noche}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>Disponible:</strong> {props.disponibilidad ? 'Disponible' : 'No disponible'}
             </Typography>
           </DialogContent>
         </>
