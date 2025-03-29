@@ -4,10 +4,7 @@ import LoginForm from "./components/LoginForm";
 import Dashboard from "./components/Dashboard";
 import { useUser } from "./context/UserContext";
 import { UserProvider } from "./context/UserContext";
-import { ReservationProvider } from "./context/ReservationContext";
-import { HotelProvider } from "./context/HotelContext";
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
-import { RoomProvider } from "./context/RoomsContext";
 
 // Definir el tema oscuro global
 const darkTheme = createTheme({
@@ -158,15 +155,9 @@ const App: React.FC = () => {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <UserProvider>
-        <HotelProvider>
-          <RoomProvider>
-            <ReservationProvider>
-              <div className="App">
-                <AppContent />
-              </div>
-            </ReservationProvider>
-          </RoomProvider>
-        </HotelProvider>
+        <div className="App">
+          <AppContent />
+        </div>
       </UserProvider>
     </ThemeProvider>
   );
