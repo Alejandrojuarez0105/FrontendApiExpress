@@ -27,8 +27,8 @@ import { es } from 'date-fns/locale';
 import { useHotels } from '../context/HotelContext';
 import { useReservations } from '../context/ReservationContext';
 import { useUser } from '../context/UserContext';
-
-// Eliminamos los datos estáticos, ahora los obtendremos del contexto
+import { HotelProvider } from '../context/HotelContext';
+import { ReservationProvider } from '../context/ReservationContext';
 
 interface FormData {
   hotelId: string;
@@ -39,7 +39,7 @@ interface FormData {
   comentarios: string;
 }
 
-const AddReservas: React.FC = () => {
+const AddReservaForm: React.FC = () => {
   const theme = useTheme();
   const { hotels, tiposHabitacion, loading: hotelsLoading, error: hotelsError, fetchHotels, fetchTiposHabitacion } = useHotels();
   const { refreshReservations } = useReservations();
@@ -541,5 +541,15 @@ const AddReservas: React.FC = () => {
     </LocalizationProvider>
   );
 };
+
+const AddReservas: React.FC = () => {
+  return (
+    <HotelProvider>
+      <ReservationProvider>
+        <AddReservaForm />
+      </ReservationProvider>
+    </HotelProvider>
+  );
+}
 
 export default AddReservas;

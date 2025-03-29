@@ -2,9 +2,8 @@ import React from 'react';
 import Card from './Card/Card';
 import { Container, Grid, Typography, Box, CircularProgress, Alert, Paper } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useReservations } from '../context/ReservationContext';
+import { useReservations, ReservationProvider } from '../context/ReservationContext';
 
-// Esta interfaz se utiliza solo para mapear datos del contexto a nuestro componente Card
 interface ReservaCardData {
   _id: string;
   title: string; 
@@ -20,16 +19,14 @@ interface ReservaCardData {
   };
 }
 
-const Reservas: React.FC = () => {
+const ReservasContent: React.FC = () => {
   const { reservations, loading, error, refreshReservations } = useReservations();
   const theme = useTheme();
 
-  // Ejecutamos refreshReservations al montar el componente para asegurar datos actualizados
   React.useEffect(() => {
     refreshReservations();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Mapear las reservas del contexto al formato que espera nuestro componente Card
   const mapearReservasParaCard = (): ReservaCardData[] => {
     return reservations.map(reserva => ({
       _id: reserva._id,
@@ -37,7 +34,7 @@ const Reservas: React.FC = () => {
       description: `${reserva.habitacion.tipo} - ${reserva.habitacion.capacidad} personas`,
       fechaInicio: reserva.fecha_inicio,
       fechaFin: reserva.fecha_fin,
-      estado: reserva.estado.charAt(0).toUpperCase() + reserva.estado.slice(1), // Primera letra mayúscula
+      estado: reserva.estado.charAt(0).toUpperCase() + reserva.estado.slice(1),
       precio: reserva.precio_total,
       numeroPersonas: reserva.habitacion.capacidad,
       hotel: {
@@ -155,5 +152,11 @@ const Reservas: React.FC = () => {
     </Box>
   );
 };
+
+const Reservas: React.FC = () => (
+  <ReservationProvider>
+    <ReservasContent />
+  </ReservationProvider>
+);
 
 export default Reservas;
