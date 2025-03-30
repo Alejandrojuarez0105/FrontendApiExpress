@@ -3,28 +3,26 @@ import Card from './Card/Card';
 import { Container, Grid, Typography, Box, CircularProgress, Alert, Paper } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
-interface Hotel {
+interface Cuarto {
   _id: string;
-  nombre: string;
-  descripcion: string;
-  direccion: string;
-  telefono: string;
-  email: string;
-  servicios: string[];
-  estrellas: number;
+  hotel_id: string;
+  tipo: string;
+  capacidad: number;
+  precio_por_noche: number;
+  disponibilidad: boolean;
 }
 
-const Hoteles: React.FC = () => {
-  const [hoteles, setHoteles] = useState<Hotel[]>([]);
+const Cuartos: React.FC = () => {
+  const [cuartos, setRooms] = useState<Cuarto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const theme = useTheme();
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/hoteles')
+    fetch('http://localhost:3000/api/rooms')
       .then((response) => response.json())
       .then((data) => {
-        setHoteles(data);
+        setRooms(data);
         setLoading(false);
       })
       .catch((err) => {
@@ -94,24 +92,24 @@ const Hoteles: React.FC = () => {
                 textShadow: '1px 1px 3px rgba(0,0,0,0.3)'
               }}
             >
-                Hoteles
+                Cuartos
             </Typography>
           </Paper>
 
-        {hoteles.length > 0 ? (
+        {cuartos.length > 0 ? (
           <Grid container spacing={3}>
-            {hoteles.map((hotel) => (
-              <Grid item xs={12} sm={6} md={4} key={hotel._id}>
+            {cuartos.map((cuarto) => (
+              <Grid item xs={12} sm={6} md={4} key={cuarto.tipo}>
                 <Box sx={{ height: '100%' }}>
                   <Card
-                    type="hotel"
-                    title={hotel.nombre}
-                    description={hotel.descripcion}
-                    direccion={hotel.direccion}
-                    estrellas={hotel.estrellas}
-                    email={hotel.email}
-                    telefono={hotel.telefono}
-                    servicios={hotel.servicios}
+                    type="room"
+                    title={cuarto.tipo}
+                    description={'Habitación de tipo ' + cuarto.tipo}
+                    tipo={cuarto.tipo}
+                    hotel_id={cuarto.hotel_id}
+                    capacidad={cuarto.capacidad}
+                    precio_por_noche={cuarto.precio_por_noche}
+                    disponibilidad={cuarto.disponibilidad}
                   />
                 </Box>
               </Grid>
@@ -127,7 +125,7 @@ const Hoteles: React.FC = () => {
             }}
           >
             <Typography variant="h6" align="center">
-              No se encontraron hoteles
+              No se encontraron cuartos
             </Typography>
           </Paper>
         )}
@@ -136,4 +134,4 @@ const Hoteles: React.FC = () => {
   );
 };
 
-export default Hoteles;
+export default Cuartos;
