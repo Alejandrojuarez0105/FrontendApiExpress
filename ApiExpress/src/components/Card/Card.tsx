@@ -252,7 +252,6 @@ const Card: React.FC<CardProps> = (props) => {
     return null;
   };
 
-  // Contenido del diálogo según el tipo
   const renderDialogContent = () => {
     if (props.type === 'hotel') {
       return (

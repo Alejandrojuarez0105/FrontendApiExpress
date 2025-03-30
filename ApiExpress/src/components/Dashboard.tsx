@@ -23,6 +23,7 @@ import Reservas from './Reservas';
 import AddReservas from './AddReservas';
 import PaymentIcon from '@mui/icons-material/Payment';
 import Cuarto from './Cuartos';
+import Payment from './Payment';
 
 interface DemoPageContentProps {
   pathname: string;
@@ -131,7 +132,7 @@ const demoTheme = createTheme({
   },
 });
 
-function DemoPageContent({ pathname }: DemoPageContentProps) {
+function DemoPageContent({ pathname, navigate }: DemoPageContentProps & { navigate: (path: string) => void }) {
   console.log('Pathname actual:', pathname);
   
   const renderContent = () => {
@@ -201,6 +202,8 @@ function DemoPageContent({ pathname }: DemoPageContentProps) {
         return <Configuraciones />;
       case '/rooms':
         return <Cuarto />;
+      case '/payments':
+        return <Payment navigate={navigate} />; // Pass navigate to Payment
       default:
         console.log('Ruta no encontrada:', pathname);
         return (
@@ -356,7 +359,7 @@ function DashboardLayoutAccountSidebar(props: DashboardLayoutProps) {
         <DashboardLayout
           slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
         >
-          <DemoPageContent pathname={pathname} />
+          <DemoPageContent pathname={pathname} navigate={router.navigate} /> {/* Pass navigate */}
         </DashboardLayout>
       </AppProvider>
   );
