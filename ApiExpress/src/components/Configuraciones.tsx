@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useUser } from '../context/UserContext';
 import { 
   Box, 
@@ -11,10 +11,17 @@ import {
   Container
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import EditIcon from '@mui/icons-material/Edit';
+import EditarPerfil from './EditarPerfil';
 
 const Configuraciones: React.FC = () => {
   const { user } = useUser();
   const theme = useTheme();
+  const [editMode, setEditMode] = useState(false);
+
+  if (editMode) {
+    return <EditarPerfil />;
+  }
 
   if (!user) {
     return (
@@ -54,9 +61,14 @@ const Configuraciones: React.FC = () => {
             color: theme.palette.text.primary
           }}
         >
-          <Typography variant="h4" component="h1" align="center" gutterBottom>
-            Perfil de Usuario
-          </Typography>
+        <Typography variant="h4" component="h1" align="center" gutterBottom>
+          Perfil de Usuario 
+          <EditIcon 
+            fontSize="small" 
+            sx={{ verticalAlign: 'middle', ml: 1, cursor: 'pointer' }} 
+            onClick={() => setEditMode(true)} 
+          />
+        </Typography>
           
           <Box 
             sx={{ 
@@ -114,5 +126,6 @@ const Configuraciones: React.FC = () => {
     </Box>
   );
 };
+
 
 export default Configuraciones;

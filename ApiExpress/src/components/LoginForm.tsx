@@ -19,7 +19,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 const LoginForm: React.FC = () => {
   const { setUserId, setUser } = useUser();
-  const [email, setEmail] = useState('');
+  const [usuario, setUsuario] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -35,7 +35,7 @@ const LoginForm: React.FC = () => {
       const response = await fetch('http://localhost:3000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: email, password }),
+        body: JSON.stringify({ username: usuario, password }),
         credentials: 'include',
       });
 
@@ -98,13 +98,13 @@ const LoginForm: React.FC = () => {
                 margin="normal"
                 required
                 fullWidth
-                id="email"
-                label="Email"
-                name="email"
-                autoComplete="email"
+                id="usuario"
+                label="Usuario"
+                name="usuario"
+                autoComplete="usuario"
                 autoFocus
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={usuario}
+                onChange={(e) => setUsuario(e.target.value)}
                 sx={{ mb: 2 }}
                 InputProps={{
                   style: { color: theme.palette.text.primary }
