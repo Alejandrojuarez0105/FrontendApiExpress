@@ -45,7 +45,6 @@ const AddReservaForm: React.FC = () => {
   const { refreshReservations } = useReservations();
   const { user } = useUser();
   
-  // Estado para el formulario
   const [formData, setFormData] = useState<FormData>({
     hotelId: '',
     tipoHabitacionId: '',
@@ -55,59 +54,39 @@ const AddReservaForm: React.FC = () => {
     comentarios: ''
   });
   
-  // Filtrar tipos de habitación según el hotel seleccionado
   const tiposHabitacionFiltrados = useMemo(() => {
     if (!formData.hotelId) return [];
     return tiposHabitacion.filter(tipo => tipo.hotel_id === formData.hotelId && tipo.disponibilidad);
   }, [tiposHabitacion, formData.hotelId]);
   
-  // Estado para errores de validación
   const [errors, setErrors] = useState<Record<string, string>>({});
   
-  // Estado para notificaciones
   const [notification, setNotification] = useState({
     open: false,
     message: '',
     severity: 'success' as 'success' | 'error'
   });
 
-  // Estado para indicar si está enviando el formulario
   const [submitting, setSubmitting] = useState(false);
 
-  // React.useEffect para refrescar los datos si es necesario
-  React.useEffect(() => {
-    // Si no hay hoteles o tipos de habitación, intentamos cargarlos
-    if (hotels.length === 0) {
-      fetchHotels();
-    }
-    if (tiposHabitacion.length === 0) {
-      fetchTiposHabitacion();
-    }
-  }, [hotels.length, tiposHabitacion.length, fetchHotels, fetchTiposHabitacion]);
-
-  // Manejador de cambios en campos de texto
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    // Limpiar error al cambiar el valor
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
-  // Manejador de cambios en selects
   const handleSelectChange = (e: SelectChangeEvent) => {
     const name = e.target.name as keyof FormData;
     const value = e.target.value as string;
     
     if (name === 'tipoHabitacionId') {
-      // Si se está seleccionando un tipo de habitación, actualizar también el número de personas
       const selectedRoom = tiposHabitacion.find(t => t._id === value);
       if (selectedRoom) {
         setFormData(prev => ({ 
           ...prev, 
           [name]: value,
-          // Establecer el número de personas igual a la capacidad de la habitación
           numeroPersonas: selectedRoom.capacidad 
         }));
       } else {
@@ -117,26 +96,21 @@ const AddReservaForm: React.FC = () => {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
     
-    // Limpiar error al cambiar el valor
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
-  // Manejador para las fechas
   const handleDateChange = (date: Date | null, field: 'fechaInicio' | 'fechaFin') => {
     setFormData(prev => ({ ...prev, [field]: date }));
-    // Limpiar error al cambiar la fecha
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
 
-  // Manejador para el envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validación básica
     const newErrors: Record<string, string> = {};
     
     if (!formData.hotelId) newErrors.hotelId = 'Selecciona un hotel';
@@ -156,11 +130,9 @@ const AddReservaForm: React.FC = () => {
     try {
       setSubmitting(true);
       
-      // Encontrar el tipo de habitación seleccionado
       const selectedTipoHabitacion = tiposHabitacion.find(t => t._id === formData.tipoHabitacionId);
       const selectedHotel = hotels.find(h => h._id === formData.hotelId);
       
-      // Calcular el número de noches
       const fechaInicio = formData.fechaInicio ? new Date(formData.fechaInicio) : null;
       const fechaFin = formData.fechaFin ? new Date(formData.fechaFin) : null;
       
@@ -169,10 +141,8 @@ const AddReservaForm: React.FC = () => {
         numNoches = Math.max(1, Math.ceil((fechaFin.getTime() - fechaInicio.getTime()) / (1000 * 60 * 60 * 24)));
       }
       
-      // Calcular precio total
       const precioTotal = selectedTipoHabitacion?.precio_por_noche ? selectedTipoHabitacion.precio_por_noche * numNoches : 0;
       
-      // Preparar datos para enviar al backend
       const reservaData = {
         usuario_id: user?._id,
         hotel_id: formData.hotelId,
@@ -184,7 +154,6 @@ const AddReservaForm: React.FC = () => {
       
       console.log('Datos de la reserva a enviar:', reservaData);
       
-      // Enviar los datos al backend
       const response = await fetch('http://localhost:3000/api/reservas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -199,17 +168,14 @@ const AddReservaForm: React.FC = () => {
       const data = await response.json();
       console.log('Reserva creada:', data);
       
-      // Refrescar las reservas para que la nueva aparezca en la lista
       await refreshReservations();
       
-      // Mostrar notificación de éxito
       setNotification({
         open: true,
         message: '¡Reserva creada con éxito!',
         severity: 'success'
       });
       
-      // Reiniciar formulario
       setFormData({
         hotelId: '',
         tipoHabitacionId: '',
@@ -230,12 +196,10 @@ const AddReservaForm: React.FC = () => {
     }
   };
 
-  // Cerrar notificación
   const handleCloseNotification = () => {
     setNotification(prev => ({ ...prev, open: false }));
   };
 
-  // Si está cargando, mostrar indicador
   if (hotelsLoading) {
     return (
       <Box 
@@ -254,7 +218,6 @@ const AddReservaForm: React.FC = () => {
     );
   }
 
-  // Si hay un error, mostrar mensaje
   if (hotelsError) {
     return (
       <Box 
@@ -317,7 +280,6 @@ const AddReservaForm: React.FC = () => {
           >
             <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
               <Grid container spacing={3}>
-                {/* Selección de Hotel */}
                 <Grid item xs={12} md={6}>
                   <FormControl fullWidth error={!!errors.hotelId}>
                     <InputLabel id="hotel-label">Hotel</InputLabel>
@@ -329,7 +291,6 @@ const AddReservaForm: React.FC = () => {
                       label="Hotel"
                       onChange={(e) => {
                         handleSelectChange(e);
-                        // Al cambiar el hotel, reiniciamos el tipo de habitación
                         setFormData(prev => ({ ...prev, tipoHabitacionId: '' }));
                       }}
                     >
@@ -343,7 +304,6 @@ const AddReservaForm: React.FC = () => {
                   </FormControl>
                 </Grid>
 
-                {/* Tipo de Habitación */}
                 <Grid item xs={12} md={6}>
                   <FormControl 
                     fullWidth 
@@ -370,7 +330,6 @@ const AddReservaForm: React.FC = () => {
                   </FormControl>
                 </Grid>
 
-                {/* Mostrar información adicional sobre la habitación seleccionada */}
                 {formData.tipoHabitacionId && (
                   <Grid item xs={12}>
                     <Paper 
@@ -422,7 +381,6 @@ const AddReservaForm: React.FC = () => {
                   </Grid>
                 )}
 
-                {/* Fecha de Entrada */}
                 <Grid item xs={12} md={6}>
                   <DatePicker
                     label="Fecha de Entrada"
@@ -438,7 +396,6 @@ const AddReservaForm: React.FC = () => {
                   />
                 </Grid>
 
-                {/* Fecha de Salida */}
                 <Grid item xs={12} md={6}>
                   <DatePicker
                     label="Fecha de Salida"
@@ -455,7 +412,6 @@ const AddReservaForm: React.FC = () => {
                   />
                 </Grid>
 
-                {/* Número de Personas */}
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
@@ -480,7 +436,6 @@ const AddReservaForm: React.FC = () => {
                   />
                 </Grid>
 
-                {/* Comentarios */}
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
@@ -494,7 +449,6 @@ const AddReservaForm: React.FC = () => {
                   />
                 </Grid>
 
-                {/* Botón de Envío */}
                 <Grid item xs={12} sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
                   <Button
                     type="submit"
@@ -527,7 +481,6 @@ const AddReservaForm: React.FC = () => {
         </Container>
       </Box>
 
-      {/* Notificación */}
       <Snackbar
         open={notification.open}
         autoHideDuration={6000}

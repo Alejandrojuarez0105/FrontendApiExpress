@@ -20,12 +20,8 @@ interface ReservaCardData {
 }
 
 const ReservasContent: React.FC = () => {
-  const { reservations, loading, error, refreshReservations } = useReservations();
+  const { reservations, loading, error } = useReservations();
   const theme = useTheme();
-
-  React.useEffect(() => {
-    refreshReservations();
-  }, []);
 
   const mapearReservasParaCard = (): ReservaCardData[] => {
     return reservations.map(reserva => ({
