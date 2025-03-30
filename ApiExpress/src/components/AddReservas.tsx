@@ -161,12 +161,11 @@ const AddReservaForm: React.FC = () => {
         credentials: 'include'
       });
       
-      if (!response.ok) {
-        throw new Error('Error al crear la reserva');
-      }
-      
       const data = await response.json();
-      console.log('Reserva creada:', data);
+
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
       
       await refreshReservations();
       
