@@ -67,6 +67,7 @@ function PaymentTable({
   const [open, setOpen] = useState(false); // State to control modal visibility
   const [snackbarOpen, setSnackbarOpen] = useState(false); // State to control notification visibility
   const [selectedReservation, setSelectedReservation] = useState<string | null>(null); // Selected reservation ID
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null); // Selected payment method
   const { reservations, setReservations, refreshReservations } = useReservations(); // Include refreshReservations
   const { user } = useUser(); // Retrieve user context here
   const { fetchPayments } = usePayment(); // Retrieve fetchPayments from PaymentContext
@@ -81,7 +82,7 @@ function PaymentTable({
   };
 
   const handlePay = async () => {
-    if (selectedReservation) {
+    if (selectedReservation && selectedPaymentMethod) {
       console.log('Selected reservation ID:', selectedReservation);
 
       try {
@@ -92,7 +93,7 @@ function PaymentTable({
         const paymentData = {
           usuario_id: user._id,
           monto: reservations.find((res) => res._id === selectedReservation)?.precio_total || 0,
-          metodo_pago: 'tarjeta_credito', // Example payment method
+          metodo_pago: selectedPaymentMethod, // Use selected payment method
           fecha_pago: new Date().toISOString().split('T')[0],
         };
 
@@ -266,11 +267,33 @@ function PaymentTable({
               </option>
             ))}
           </TextField>
+
+          {/* Campo para seleccionar el método de pago */}
+          <TextField
+            select
+            label="Método de Pago"
+            value={selectedPaymentMethod}
+            onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+            fullWidth
+            SelectProps={{
+              native: true,
+            }}
+            sx={{ mb: 2 }}
+          >
+            <option value="" disabled>
+              Seleccione un método de pago
+            </option>
+            <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+            <option value="Tarjeta de Débito">Tarjeta de Débito</option>
+            <option value="PayPal">PayPal</option>
+            <option value="Transferencia Bancaria">Transferencia Bancaria</option>
+          </TextField>
+
           <Button
             variant="contained"
             color="primary"
             onClick={handlePay}
-            disabled={!selectedReservation}
+            disabled={!selectedReservation || !selectedPaymentMethod}
             fullWidth
           >
             Pagar
