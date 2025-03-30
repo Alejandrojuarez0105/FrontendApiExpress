@@ -1,38 +1,108 @@
 import React, { useEffect } from 'react';
+import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
+import { Box, Typography, Chip } from '@mui/material';
 import { usePayment } from '../context/PaymentContext';
 
-const TestPaymentContext: React.FC = () => {
+const Payment: React.FC = () => {
   const { payments, loading, error, fetchPayments } = usePayment();
 
   useEffect(() => {
     fetchPayments(); // Llama a fetchPayments una sola vez al montar el componente
-  }, [fetchPayments]); // Ahora fetchPayments tiene una referencia estable
+  }, [fetchPayments]);
 
   if (loading) {
-    return <div>Cargando pagos...</div>;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <Typography variant="h6">Cargando pagos...</Typography>
+      </Box>
+    );
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <Typography variant="h6" color="error">
+          Error: {error}
+        </Typography>
+      </Box>
+    );
   }
 
   return (
-    <div style={{ color: 'black' }}>
-      <h1 style={{ color: 'blue' }}>Prueba del Contexto de Pagos</h1>
-      <h1>Pagos</h1>
-      {payments.length === 0 ? (
-        <p>No hay pagos disponibles.</p>
-      ) : (
-        <ul>
-          {payments.map((payment) => (
-            <li key={payment._id}>
-              <strong>ID:</strong> {payment._id} | <strong>Monto:</strong> {payment.monto} | <strong>Método:</strong> {payment.metodo_pago}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        padding: 2,
+      }}
+    >
+      <Box sx={{ height: 520, width: '80%' }}>
+        <DataGrid
+          rows={payments} // Asigna los datos de los pagos
+          getRowId={(row) => row._id} // Usa _id como identificador único
+          columns={[
+            { field: '_id', headerName: 'ID de Pago', width: 150 },
+            {
+              field: 'hotel_nombre',
+              headerName: 'Nombre del Hotel',
+              width: 200,
+              valueGetter: (params) => {
+                if (!params || !params.row) {
+                  return 'Sin datos'; // Manejo seguro si params o params.row es undefined
+                }
+                const reserva = params.row.reserva_id;
+                if (!reserva || !reserva.hotel_id) {
+                  return 'Sin hotel';
+                }
+                return reserva.hotel_id.nombre || 'Sin hotel';
+              },
+            },
+            { field: 'fecha_pago', headerName: 'Fecha de Pago', width: 200 },
+            { field: 'monto', headerName: 'Monto', width: 150 },
+            { field: 'metodo_pago', headerName: 'Método de Pago', width: 200 },
+            {
+              field: 'estado',
+              headerName: 'Estado',
+              width: 150,
+              renderCell: (params: GridRenderCellParams) => (
+                <Chip
+                  label={params.value}
+                  color={
+                    params.value === 'completado'
+                      ? 'success'
+                      : params.value === 'pendiente'
+                      ? 'warning'
+                      : 'default'
+                  }
+                  variant="outlined"
+                />
+              ),
+            },
+          ]}
+          loading={loading}
+          rowHeight={38}
+          checkboxSelection
+          disableRowSelectionOnClick
+        />
+      </Box>
+    </Box>
   );
 };
 
-export default TestPaymentContext;
+export default Payment;
