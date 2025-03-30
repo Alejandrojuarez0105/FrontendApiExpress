@@ -1,18 +1,19 @@
 import Box from '@mui/material/Box';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
-import { usePayment, PaymentProvider } from '../context/PaymentContext'; // Import PaymentProvider
+import { usePayment, PaymentProvider } from '../context/PaymentContext';
 import Typography from '@mui/material/Typography';
-import { useTheme } from '@mui/material/styles'; // Import the global theme
-import Paper from '@mui/material/Paper'; // Ensure Paper is imported
-import Chip from '@mui/material/Chip'; // Import Chip
-import Button from '@mui/material/Button'; // Import Button
-import Modal from '@mui/material/Modal'; // Import Modal
-import TextField from '@mui/material/TextField'; // Import TextField for payment input
-import { useReservations } from '../context/ReservationContext'; // Import ReservationContext
-import { ReservationProvider } from '../context/ReservationContext';
-import Snackbar from '@mui/material/Snackbar'; // Import Snackbar for notifications
-import Alert from '@mui/material/Alert'; // Import Alert for styled notifications
+import { useTheme } from '@mui/material/styles';
+import Paper from '@mui/material/Paper';
+import Chip from '@mui/material/Chip';
+import Button from '@mui/material/Button';
+import Modal from '@mui/material/Modal';
+import TextField from '@mui/material/TextField';
+import { useReservations, ReservationProvider } from '../context/ReservationContext';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import { useUser } from '../context/UserContext'; // Ensure useUser is imported
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 function SearchBar({ searchText, setSearchText, theme }: { searchText: string; setSearchText: (text: string) => void; theme: any }) {
   return (
@@ -52,42 +53,90 @@ function SearchBar({ searchText, setSearchText, theme }: { searchText: string; s
   );
 }
 
-function PaymentTable({ filteredPayments, loading, theme }: { filteredPayments: any[]; loading: boolean; theme: any }) {
+function PaymentTable({
+  filteredPayments,
+  loading,
+  theme,
+  navigate, // Accept navigate as a prop
+}: {
+  filteredPayments: any[];
+  loading: boolean;
+  theme: any;
+  navigate: (path: string) => void; // Define the type for navigate
+}) {
   const [open, setOpen] = useState(false); // State to control modal visibility
   const [snackbarOpen, setSnackbarOpen] = useState(false); // State to control notification visibility
   const [selectedReservation, setSelectedReservation] = useState<string | null>(null); // Selected reservation ID
   const { reservations, setReservations, refreshReservations } = useReservations(); // Include refreshReservations
+  const { user } = useUser(); // Retrieve user context here
+  const { fetchPayments } = usePayment(); // Retrieve fetchPayments from PaymentContext
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleSnackbarClose = () => setSnackbarOpen(false);
 
+  const handleGoToReservations = () => {
+    navigate('/reservas/mis-reservas'); // Use the custom navigate function
+  };
+
   const handlePay = async () => {
     if (selectedReservation) {
       console.log('Selected reservation ID:', selectedReservation);
 
-      // Update the reservation's estado to "confirmada"
-      setReservations((prevReservations) => {
-        const updatedReservations = prevReservations.map((res) => {
-          if (res._id === selectedReservation) {
-            console.log('Updating reservation:', res);
-            return { ...res, estado: 'confirmada' };
-          }
-          return res;
+      try {
+        if (!user || !user._id) {
+          throw new Error('Usuario no autenticado');
+        }
+
+        const paymentData = {
+          usuario_id: user._id,
+          monto: reservations.find((res) => res._id === selectedReservation)?.precio_total || 0,
+          metodo_pago: 'tarjeta_credito', // Example payment method
+          fecha_pago: new Date().toISOString().split('T')[0],
+        };
+
+        console.log('Payment data being sent:', paymentData);
+
+        const response = await fetch(`http://localhost:3000/api/pagos/reserva/${selectedReservation}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(paymentData),
         });
-        console.log('Updated reservations:', updatedReservations);
-        return updatedReservations;
-      });
 
-      // Refresh reservations to ensure UI reflects changes
-      await refreshReservations();
+        if (!response.ok) {
+          const errorText = await response.text(); // Handle non-JSON error responses
+          console.error('API error response:', errorText);
+          throw new Error(`Error al realizar el pago: ${response.statusText}`);
+        }
 
-      // Show success notification
-      setSnackbarOpen(true);
+        const responseData = await response.json();
+        console.log('Payment successful:', responseData);
 
-      // Close the modal
-      handleClose();
+        setReservations((prevReservations) => {
+          const updatedReservations = prevReservations.map((res) => {
+            if (res._id === selectedReservation) {
+              console.log('Updating reservation:', res);
+              return { ...res, estado: 'confirmada' };
+            }
+            return res;
+          });
+          console.log('Updated reservations:', updatedReservations);
+          return updatedReservations;
+        });
+
+        await refreshReservations();
+
+        await fetchPayments();
+
+        setSnackbarOpen(true);
+
+        handleClose();
+      } catch (error) {
+        console.error('Error processing payment:', error);
+      }
     } else {
       console.log('No reservation selected for payment.');
     }
@@ -98,7 +147,7 @@ function PaymentTable({ filteredPayments, loading, theme }: { filteredPayments: 
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 90 },
-    { field: 'hotel_name', headerName: 'Hotel', width: 200 }, // Use hotel_name field
+    { field: 'hotel_name', headerName: 'Hotel', width: 200 },
     { field: 'monto', headerName: 'Monto', width: 150 },
     { field: 'metodo_pago', headerName: 'Método de Pago', width: 150 },
     { field: 'fecha_pago', headerName: 'Fecha de Pago', width: 150 },
@@ -112,7 +161,7 @@ function PaymentTable({ filteredPayments, loading, theme }: { filteredPayments: 
           color={params.value === 'completado' ? 'success' : params.value === 'pendiente' ? 'warning' : 'error'}
           variant="outlined"
         />
-      ), // Use Chip to display status
+      ),
     },
   ];
 
@@ -122,7 +171,7 @@ function PaymentTable({ filteredPayments, loading, theme }: { filteredPayments: 
         width: '100%',
         margin: '0 auto',
         display: 'flex',
-        flexDirection: 'column', // Stack elements vertically
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 5,
@@ -164,15 +213,15 @@ function PaymentTable({ filteredPayments, loading, theme }: { filteredPayments: 
             sx={{
               width: '100%',
               display: 'flex',
-              justifyContent: 'flex-end', // Align buttons to the right
-              gap: theme.spacing(2), // Add spacing between buttons
-              marginTop: theme.spacing(4), // Add spacing between DataGrid and buttons
+              justifyContent: 'flex-end',
+              gap: theme.spacing(2),
+              marginTop: theme.spacing(4),
             }}
           >
             <Button variant="contained" color="primary" onClick={handleOpen}>
               Realizar Pago
             </Button>
-            <Button variant="outlined" color="primary">
+            <Button variant="outlined" color="primary" onClick={handleGoToReservations}>
               Ir a mis reservas
             </Button>
           </Box>
@@ -209,7 +258,7 @@ function PaymentTable({ filteredPayments, loading, theme }: { filteredPayments: 
             sx={{ mb: 2 }}
           >
             <option value="" disabled>
-              Seleccione una reserva
+              {pendingReservations.length === 0 ? 'No hay reservas pendientes' : ''}
             </option>
             {pendingReservations.map((res) => (
               <option key={res._id} value={res._id}>
@@ -244,9 +293,9 @@ function PaymentTable({ filteredPayments, loading, theme }: { filteredPayments: 
   );
 }
 
-function DataGridDemo() {
+function PaymentDataGrid({ navigate }: { navigate: (path: string) => void }) {
   const theme = useTheme(); // Use the global theme
-  const { payments, fetchPayments, loading } = usePayment(); // Use PaymentContext
+  const { payments, fetchPayments, loading } = usePayment();
   const [filteredPayments, setFilteredPayments] = useState<any[]>([]);
   const [searchText, setSearchText] = useState('');
 
@@ -297,16 +346,16 @@ function DataGridDemo() {
         </Typography>
       </Paper>
       <SearchBar searchText={searchText} setSearchText={setSearchText} theme={theme} />
-      <PaymentTable filteredPayments={filteredPayments} loading={loading} theme={theme} />
+      <PaymentTable filteredPayments={filteredPayments} loading={loading} theme={theme} navigate={navigate} />
     </Box>
   );
 }
 
-export default function Payment() {
+export default function Payment({ navigate }: { navigate: (path: string) => void }) {
   return (
     <PaymentProvider>
-      <ReservationProvider> {/* Wrap with ReservationProvider */}
-        <DataGridDemo />
+      <ReservationProvider>
+        <PaymentDataGrid navigate={navigate} />
       </ReservationProvider>
     </PaymentProvider>
   );

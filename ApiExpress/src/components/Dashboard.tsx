@@ -132,7 +132,7 @@ const demoTheme = createTheme({
   },
 });
 
-function DemoPageContent({ pathname }: DemoPageContentProps) {
+function DemoPageContent({ pathname, navigate }: DemoPageContentProps & { navigate: (path: string) => void }) {
   console.log('Pathname actual:', pathname);
   
   const renderContent = () => {
@@ -203,7 +203,7 @@ function DemoPageContent({ pathname }: DemoPageContentProps) {
       case '/rooms':
         return <Cuarto />;
       case '/payments':
-        return <Payment />;
+        return <Payment navigate={navigate} />; // Pass navigate to Payment
       default:
         console.log('Ruta no encontrada:', pathname);
         return (
@@ -359,7 +359,7 @@ function DashboardLayoutAccountSidebar(props: DashboardLayoutProps) {
         <DashboardLayout
           slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
         >
-          <DemoPageContent pathname={pathname} />
+          <DemoPageContent pathname={pathname} navigate={router.navigate} /> {/* Pass navigate */}
         </DashboardLayout>
       </AppProvider>
   );
