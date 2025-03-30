@@ -4,16 +4,20 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MenuList from '@mui/material/MenuList';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Avatar from '@mui/material/Avatar';
-import { createTheme } from '@mui/material/styles';
+import Divider from '@mui/material/Divider';
+import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import HotelSharp from '@mui/icons-material/HotelSharp';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import Hoteles from './Hoteles';
-import { HomeRepairServiceSharp, KingBedSharp } from '@mui/icons-material';
+import { HomeRepairServiceSharp, KingBed, KingBedSharp } from '@mui/icons-material';
 import Configuraciones from './Configuraciones';
 import { useUser } from '../context/UserContext'; 
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
@@ -22,8 +26,10 @@ import { Zoom } from '@mui/material';
 import Reservas from './Reservas';
 import AddReservas from './AddReservas';
 import PaymentIcon from '@mui/icons-material/Payment';
+import { title } from 'process';
 import Cuarto from './Cuartos';
 import Payment from './Payment';
+import UltimoPago from './UltimoPago';
 
 interface DemoPageContentProps {
   pathname: string;
@@ -132,7 +138,7 @@ const demoTheme = createTheme({
   },
 });
 
-function DemoPageContent({ pathname, navigate }: DemoPageContentProps & { navigate: (path: string) => void }) {
+function DemoPageContent({ pathname }: DemoPageContentProps) {
   console.log('Pathname actual:', pathname);
   
   const renderContent = () => {
@@ -148,10 +154,13 @@ function DemoPageContent({ pathname, navigate }: DemoPageContentProps & { naviga
               alignItems: 'center',
               textAlign: 'center',
             }}
-          >
-            <Typography>Bienvenido al Dashboard</Typography>
-          </Box>
-        );
+            >
+            <Typography variant="h4">Bienvenido al Dashboard</Typography>
+            <Box sx={{ width: '100%', maxWidth: '800px' }}>
+        <UltimoPago />
+      </Box>
+    </Box>
+  );
       case '/hoteles':
         console.log('Renderizando Hoteles');
         return <Hoteles />;
@@ -203,7 +212,7 @@ function DemoPageContent({ pathname, navigate }: DemoPageContentProps & { naviga
       case '/rooms':
         return <Cuarto />;
       case '/payments':
-        return <Payment navigate={navigate} />; // Pass navigate to Payment
+        return <Payment />;
       default:
         console.log('Ruta no encontrada:', pathname);
         return (
@@ -359,7 +368,7 @@ function DashboardLayoutAccountSidebar(props: DashboardLayoutProps) {
         <DashboardLayout
           slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
         >
-          <DemoPageContent pathname={pathname} navigate={router.navigate} /> {/* Pass navigate */}
+          <DemoPageContent pathname={pathname} />
         </DashboardLayout>
       </AppProvider>
   );
