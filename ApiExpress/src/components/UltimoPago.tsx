@@ -66,7 +66,7 @@ const UltimoPago: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`http://localhost:3000/api/pagos/usuario/65f601a456b789c601d456e2/ultimo`, {
+      const response = await fetch(`http://localhost:3000/api/pagos/usuario/${user._id}/ultimo`, {
         credentials: 'include'
       });
       
