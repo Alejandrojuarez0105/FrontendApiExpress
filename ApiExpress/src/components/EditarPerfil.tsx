@@ -14,7 +14,10 @@ import {
   Snackbar,
   Alert
 } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const EditarPerfil: React.FC = () => {
   const { user } = useUser();
@@ -23,7 +26,8 @@ const EditarPerfil: React.FC = () => {
   const [email, setEmail] = useState(user?.email || '');
   const [telefono, setTelefono] = useState(user?.telefono || '');
   const [username, setUsername] = useState(user?.username || '');
-  const [password, setPassword] = useState(user?.password || '');
+  const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [notification, setNotification] = useState({
@@ -31,6 +35,7 @@ const EditarPerfil: React.FC = () => {
     message: '',
     severity: 'success' as 'success' | 'error'
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   if (!user) {
     return (
@@ -52,7 +57,14 @@ const EditarPerfil: React.FC = () => {
   const handleSave = async () => {
     setLoading(true);
     setError('');
-
+    setPasswordError('');
+  
+    if (!password.trim()) {
+      setPasswordError('Debe ingresar una nueva contraseña');
+      setLoading(false);
+      return;
+    }
+  
     try {
       const response = await fetch(`http://localhost:3000/api/usuarios/${user._id}`, {
         method: 'PUT',
@@ -67,17 +79,17 @@ const EditarPerfil: React.FC = () => {
           password,
         }),
       });
-
+  
       if (!response.ok) {
         throw new Error('Error al actualizar el perfil');
       }
-
+  
       setNotification({
         open: true,
         message: '¡Perfil actualizado con éxito!',
-        severity: 'success'
+        severity: 'success',
       });
-
+  
       setTimeout(() => {
         window.location.reload();
       }, 2000);
@@ -86,7 +98,7 @@ const EditarPerfil: React.FC = () => {
       setNotification({
         open: true,
         message: 'Error al actualizar el perfil',
-        severity: 'error'
+        severity: 'error',
       });
     } finally {
       setLoading(false);
@@ -180,13 +192,25 @@ const EditarPerfil: React.FC = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <TextField 
-                label="Contraseña" 
-                fullWidth 
-                type="password"
-                variant="outlined" 
-                value={password} 
+              <TextField
+                label="Contraseña"
+                fullWidth
+                type={showPassword ? 'text' : 'password'}
+                variant="outlined"
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                error={!!passwordError}
+                helperText={passwordError}
+                InputProps={{
+                  endAdornment: (
+                    <IconButton 
+                      onClick={() => setShowPassword(!showPassword)} 
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  ),
+                }}
               />
             </Grid>
 
