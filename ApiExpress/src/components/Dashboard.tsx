@@ -24,6 +24,7 @@ import AddReservas from './AddReservas';
 import PaymentIcon from '@mui/icons-material/Payment';
 import Cuarto from './Cuartos';
 import Payment from './Payment';
+import UltimoPago from './UltimoPago';
 
 interface DemoPageContentProps {
   pathname: string;
@@ -150,6 +151,7 @@ function DemoPageContent({ pathname, navigate }: DemoPageContentProps & { naviga
             }}
           >
             <Typography>Bienvenido al Dashboard</Typography>
+            <UltimoPago />
           </Box>
         );
       case '/hoteles':

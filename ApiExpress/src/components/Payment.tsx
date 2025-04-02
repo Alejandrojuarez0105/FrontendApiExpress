@@ -94,7 +94,7 @@ function PaymentTable({
           usuario_id: user._id,
           monto: reservations.find((res) => res._id === selectedReservation)?.precio_total || 0,
           metodo_pago: selectedPaymentMethod, // Use selected payment method
-          fecha_pago: new Date().toISOString().split('T')[0],
+          fecha_pago: new Date().toISOString().slice(0, 16).replace('T', ' ')
         };
 
         console.log('Payment data being sent:', paymentData);
