@@ -15,6 +15,8 @@ import Alert from '@mui/material/Alert';
 import { useUser } from '../context/UserContext'; // Ensure useUser is imported
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function SearchBar({ searchText, setSearchText, theme }: { searchText: string; setSearchText: (text: string) => void; theme: any }) {
   return (
     <Box
@@ -99,7 +101,7 @@ function PaymentTable({
 
         console.log('Payment data being sent:', paymentData);
 
-        const response = await fetch(`http://localhost:3000/api/pagos/reserva/${selectedReservation}`, {
+        const response = await fetch(`${API_BASE_URL}/pagos/reserva/${selectedReservation}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

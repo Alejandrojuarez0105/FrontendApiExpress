@@ -19,6 +19,8 @@ import { useTheme } from '@mui/material/styles';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 const EditarPerfil: React.FC = () => {
   const { user } = useUser();
   const theme = useTheme();
@@ -66,7 +68,7 @@ const EditarPerfil: React.FC = () => {
     }
   
     try {
-      const response = await fetch(`http://localhost:3000/api/usuarios/${user._id}`, {
+      const response = await fetch(`${API_BASE_URL}/usuarios/${user._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

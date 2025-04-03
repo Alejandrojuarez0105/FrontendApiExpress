@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 interface User {
   _id: string;
   nombre: string;
@@ -26,7 +27,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const fetchUserData = async () => {
       if (userId) {
         try {
-          const response = await fetch(`http://localhost:3000/api/usuarios/${userId}`);
+            const response = await fetch(`${API_BASE_URL}/usuarios/${userId}`);
           if (!response.ok) {
             throw new Error("Error al obtener los datos del usuario");
           }

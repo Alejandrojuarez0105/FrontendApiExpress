@@ -91,7 +91,7 @@ const darkTheme = createTheme({
   },
 });
 
-const API_URL = "http://localhost:3000/api/auth/validate-token";
+const API_URL = `${process.env.REACT_APP_API_BASE_URL}/auth/validate-token`;
 
 const AppContent: React.FC = () => {
   const { setUserId, setUser } = useUser();

@@ -153,8 +153,10 @@ const AddReservaForm: React.FC = () => {
       };
       
       console.log('Datos de la reserva a enviar:', reservaData);
+
+      const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
       
-      const response = await fetch('http://localhost:3000/api/reservas', {
+      const response = await fetch(`${API_BASE_URL}/reservas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(reservaData),
