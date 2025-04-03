@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-// Definimos la interfaz para un hotel
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 export interface Hotel {
   _id: string;
   nombre: string;
@@ -60,7 +60,7 @@ export const HotelProvider: React.FC<HotelProviderProps> = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:3000/api/hoteles', {
+      const response = await fetch(`${API_BASE_URL}/hoteles`, {
         credentials: 'include'
       });
       
@@ -83,7 +83,7 @@ export const HotelProvider: React.FC<HotelProviderProps> = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:3000/api/rooms', {
+      const response = await fetch(`${API_BASE_URL}/rooms`, {
         credentials: 'include'
       });
       

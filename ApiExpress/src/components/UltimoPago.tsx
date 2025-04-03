@@ -14,6 +14,8 @@ import { ThemeProvider, createTheme, useTheme } from '@mui/material/styles';
 import { useUser } from '../context/UserContext';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -66,7 +68,7 @@ const UltimoPago: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`http://localhost:3000/api/pagos/usuario/65f601a456b789c601d456e2/ultimo`, {
+      const response = await fetch(`${API_BASE_URL}/pagos/usuario/${user._id}/ultimo`, {
         credentials: 'include'
       });
       

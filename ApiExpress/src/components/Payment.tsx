@@ -15,6 +15,8 @@ import Alert from '@mui/material/Alert';
 import { useUser } from '../context/UserContext'; // Ensure useUser is imported
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function SearchBar({ searchText, setSearchText, theme }: { searchText: string; setSearchText: (text: string) => void; theme: any }) {
   return (
     <Box
@@ -94,12 +96,12 @@ function PaymentTable({
           usuario_id: user._id,
           monto: reservations.find((res) => res._id === selectedReservation)?.precio_total || 0,
           metodo_pago: selectedPaymentMethod, // Use selected payment method
-          fecha_pago: new Date().toISOString().split('T')[0],
+          fecha_pago: new Date().toISOString().slice(0, 16).replace('T', ' ')
         };
 
         console.log('Payment data being sent:', paymentData);
 
-        const response = await fetch(`http://localhost:3000/api/pagos/reserva/${selectedReservation}`, {
+        const response = await fetch(`${API_BASE_URL}/pagos/reserva/${selectedReservation}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

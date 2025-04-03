@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { useUser } from '../context/UserContext'; // Importa el UserContext
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 export interface Usuario {
   _id: string;
   nombre: string;
@@ -53,7 +54,7 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({ children })
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`http://localhost:3000/api/pagos/usuario/${user._id}`);
+      const response = await fetch(`${API_BASE_URL}/pagos/usuario/${user._id}`);
       if (!response.ok) {
         throw new Error('Error al obtener los pagos');
       }
