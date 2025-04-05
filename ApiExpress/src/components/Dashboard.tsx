@@ -347,8 +347,14 @@ function SidebarFooterAccount({ mini }: SidebarFooterAccountProps) {
 
 const DashboardLayoutAccountSidebar = (props: DashboardLayoutProps) => {
   const { window } = props;
-  const [pathname, setPathname] = React.useState('/dashboard');
+  const [pathname, setPathname] = React.useState('/');
   const { user } = useUser();
+
+  React.useEffect(() => {
+    if (pathname === '/') {
+      setPathname('/dashboard'); // Redirige a /dashboard si la ruta es /
+    }
+  }, [pathname]);
 
   const NAVIGATION = React.useMemo(() => {
     const baseNavigation = [
