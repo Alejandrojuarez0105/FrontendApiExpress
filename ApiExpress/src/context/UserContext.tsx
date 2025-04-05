@@ -10,12 +10,21 @@ interface User {
   profilePicture: string;
 }
 
-interface UserContextType {
+export const userGuest: User = {
+  _id: '0',
+  nombre: 'Invitado',
+  email: '',
+  telefono: '',
+  historial_reservas: [],
+  username: 'invitado',
+  profilePicture: '',
+};
+
+export interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
   setUserId: (id: string | null) => void;
 }
-
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {

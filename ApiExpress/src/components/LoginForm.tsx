@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useUser } from '../context/UserContext';
+import { useUser, userGuest } from '../context/UserContext';
 import { 
   Box, 
   TextField, 
@@ -16,6 +16,7 @@ import {
 import { useTheme } from '@mui/material/styles';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm: React.FC = () => {
   const { setUserId, setUser } = useUser();
@@ -25,6 +26,7 @@ const LoginForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const theme = useTheme();
+  const navigate = useNavigate(); 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,6 +157,22 @@ const LoginForm: React.FC = () => {
               >
                 {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Iniciar sesión'}
               </Button>
+
+              <Button
+              fullWidth
+              variant="outlined"
+              color="secondary"
+              sx={{ mt: 1, py: 1.5 }}
+              onClick={() => {
+                const expires = new Date(Date.now() + 30 * 60 * 1000).toUTCString();
+                document.cookie = `guest=true; expires=${expires}; path=/`;
+                setUserId('0');
+                setUser(userGuest);
+                navigate('/dashboard');                
+              }}
+            >
+              Modo Invitado
+            </Button>
             </Box>
           </Paper>
         </Container>
