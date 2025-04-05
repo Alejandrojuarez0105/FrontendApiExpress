@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { useUser } from "./UserContext";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 interface Reservation {
   _id: string;
   usuario: {
@@ -48,7 +49,7 @@ export const ReservationProvider: React.FC<{ children: ReactNode }> = ({ childre
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`http://localhost:3000/api/reservas/usuario/${_id}`);
+      const response = await fetch(`${API_BASE_URL}/reservas/usuario/${_id}`);
       
       if (!response.ok) {
         throw new Error("Error al obtener las reservas");

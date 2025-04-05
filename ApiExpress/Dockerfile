@@ -10,7 +10,8 @@ RUN npm install
 COPY . .
 
 RUN npm install -g nodemon && \
-    npm install -g react-scripts
+    npm install -g react-scripts && \
+    npm install -g dotenv
 
 EXPOSE 3000
 

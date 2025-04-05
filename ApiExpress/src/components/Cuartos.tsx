@@ -3,6 +3,7 @@ import Card from './Card/Card';
 import { Container, Grid, Typography, Box, CircularProgress, Alert, Paper } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 interface Cuarto {
   _id: string;
   hotel_id: string;
@@ -19,7 +20,7 @@ const Cuartos: React.FC = () => {
   const theme = useTheme();
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/rooms')
+    fetch(`${API_BASE_URL}/rooms`)
       .then((response) => response.json())
       .then((data) => {
         setRooms(data);

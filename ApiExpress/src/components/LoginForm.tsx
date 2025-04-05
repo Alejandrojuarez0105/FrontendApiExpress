@@ -18,6 +18,8 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 const LoginForm: React.FC = () => {
   const { setUserId, setUser } = useUser();
   const [usuario, setUsuario] = useState('');
@@ -34,7 +36,7 @@ const LoginForm: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3000/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: usuario, password }),
@@ -42,6 +44,7 @@ const LoginForm: React.FC = () => {
       });
 
       if (!response.ok) {
+        console.log('Error en la respuesta del servidor:', process.env.REACT_APP_API_URL);
         throw new Error('Credenciales incorrectas');
       }
 

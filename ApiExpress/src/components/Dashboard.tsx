@@ -27,6 +27,7 @@ import Cuarto from './Cuartos';
 import Payment from './Payment';
 import UltimoPago from './UltimoPago';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 interface DemoPageContentProps {
   pathname: string;
 }
@@ -250,7 +251,8 @@ function SidebarFooterAccount({ mini }: SidebarFooterAccountProps) {
       if (user._id === '0') {
         document.cookie = 'guest=; Max-Age=0; path=/';
       } else {
-        await fetch('http://localhost:3000/api/auth/logout', {
+        const baseUrl = API_BASE_URL || 'http://localhost:3000/api';
+      await fetch(`${baseUrl}/auth/logout`, {
           method: 'POST',
           credentials: 'include',
         });
