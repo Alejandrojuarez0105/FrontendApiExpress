@@ -7,13 +7,13 @@ const Home: React.FC = () => {
   return (
     <Box
       sx={{
-        display: 'flex', // Usa flexbox para controlar la alineación
-        flexDirection: 'row', // Alinea los componentes verticalmente
-        justifyContent: 'flex-start', // Alinea al inicio horizontalmente
-        alignItems: 'center', // Centra los componentes horizontalmente
-        gap: 4, // Espaciado entre los componentes
-        padding: 4, // Espaciado interno
-        backgroundColor: 'background.default', // Fondo del tema
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+      gap: 4,
+      padding: 4,
+      backgroundColor: 'background.default',
       }}
     >
       <UltimoPago />
