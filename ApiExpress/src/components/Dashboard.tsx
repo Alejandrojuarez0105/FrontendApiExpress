@@ -2,6 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { keyframes } from "@emotion/react";
 import Stack from '@mui/material/Stack';
 import MenuList from '@mui/material/MenuList';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -33,55 +34,6 @@ interface DemoPageContentProps {
 interface DashboardLayoutProps {
   window?: () => Window;
 }
-
-const NAVIGATION = [
-  {
-    kind: 'header' as const,
-    title: 'Main items',
-  },
-  {
-    segment: 'dashboard',
-    title: 'Dashboard',
-    icon: <DashboardIcon />,
-  },
-  {
-    segment: 'reservas',
-    title: 'Reservas',
-    icon: <HomeRepairServiceSharp />,
-    children: [
-      {
-        segment: 'crear-reserva',
-        title: 'Crear Reserva',
-        icon: <HomeRepairServiceSharp />,
-      },
-      {
-        segment: 'mis-reservas',
-        title: 'Mis Reservas',
-        icon: <HomeRepairServiceSharp />,
-      },
-    ],
-  },
-  {
-    segment: 'hoteles',
-    title: 'Hoteles',
-    icon: <HotelSharp />,
-  },
-  {
-    segment: 'payments',
-    title: 'Pagos',
-    icon: <PaymentIcon />
-  },
-  { 
-    segment: 'rooms',
-    title: 'Cuartos',
-    icon: <KingBedSharp />
-  },
-  {
-    segment: 'configuraciones',
-    title: 'Configuraciones',
-    icon: <SettingsIcon />,
-  },
-];
 
 const demoTheme = createTheme({
   palette: {
@@ -133,9 +85,31 @@ const demoTheme = createTheme({
   },
 });
 
+const slideUp = keyframes`
+  0% {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+`;
+
+const bounce = keyframes`
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+`;
+
 function DemoPageContent({ pathname, navigate }: DemoPageContentProps & { navigate: (path: string) => void }) {
-  console.log('Pathname actual:', pathname);
-  
+  const { user } = useUser();  
   const renderContent = () => {
     switch (pathname) {
       case '/dashboard':
@@ -150,8 +124,37 @@ function DemoPageContent({ pathname, navigate }: DemoPageContentProps & { naviga
               textAlign: 'center',
             }}
           >
-            <Typography>Bienvenido al Dashboard</Typography>
-            <UltimoPago />
+            {!user || user._id === '0' ? (
+              <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 'bold',
+                fontSize: '2.5rem',
+                textAlign: 'center',
+                color: '#262926',
+                backgroundColor: '#f4f4f4',
+                padding: '20px',
+                borderRadius: '12px',
+                animation: `${slideUp} 1s ease-out, ${bounce} 1s ease-in-out`,
+                animationDelay: '0.3s',
+                animationIterationCount: 'infinite',
+                animationDirection: 'alternate',
+                marginTop: '20vh',
+                transition: 'all 0.3s ease',
+                "&:hover": {
+                  color: "#ffffff",
+                  backgroundColor: "#3f51b5",
+                }
+              }}
+            >
+              ¡Ingrese con su usuario!
+              </Typography>
+            ) : (
+              <>
+                <Typography variant="h5">Bienvenido al Dashboard</Typography>
+                <UltimoPago />
+              </>
+            )}
           </Box>
         );
       case '/hoteles':
@@ -338,9 +341,69 @@ function SidebarFooterAccount({ mini }: SidebarFooterAccountProps) {
   );
 }
 
-function DashboardLayoutAccountSidebar(props: DashboardLayoutProps) {
+const DashboardLayoutAccountSidebar = (props: DashboardLayoutProps) => {
   const { window } = props;
   const [pathname, setPathname] = React.useState('/dashboard');
+  const { user } = useUser();
+
+  const NAVIGATION = React.useMemo(() => {
+    const baseNavigation = [
+      {
+        kind: 'header' as const,
+        title: 'Main items',
+      },
+      {
+        segment: 'dashboard',
+        title: 'Dashboard',
+        icon: <DashboardIcon />,
+      },
+      {
+        segment: 'hoteles',
+        title: 'Hoteles',
+        icon: <HotelSharp />,
+      },
+      {
+        segment: 'rooms',
+        title: 'Cuartos',
+        icon: <KingBedSharp />,
+      },
+    ];
+
+    if (user && user._id !== '0') {
+      return [
+        ...baseNavigation,
+        {
+          segment: 'configuraciones',
+          title: 'Configuraciones',
+          icon: <SettingsIcon />,
+        },
+        {
+          segment: 'payments',
+          title: 'Pagos',
+          icon: <PaymentIcon />,
+        },
+        {
+          segment: 'reservas',
+          title: 'Reservas',
+          icon: <HomeRepairServiceSharp />,
+          children: [
+            {
+              segment: 'crear-reserva',
+              title: 'Crear Reserva',
+              icon: <HomeRepairServiceSharp />,
+            },
+            {
+              segment: 'mis-reservas',
+              title: 'Mis Reservas',
+              icon: <HomeRepairServiceSharp />,
+            },
+          ],
+        },
+      ];
+    } else {
+      return baseNavigation;
+    }
+  }, [user]);
 
   const router = React.useMemo(() => {
     return {
@@ -356,20 +419,20 @@ function DashboardLayoutAccountSidebar(props: DashboardLayoutProps) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-      <AppProvider
-        navigation={NAVIGATION}
-        router={router}
-        theme={demoTheme}
-        window={demoWindow}
+    <AppProvider
+      navigation={NAVIGATION}
+      router={router}
+      theme={demoTheme}
+      window={demoWindow}
+    >
+      <DashboardLayout
+        slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
       >
-        <DashboardLayout
-          slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
-        >
-          <DemoPageContent pathname={pathname} navigate={router.navigate} /> {/* Pass navigate */}
-        </DashboardLayout>
-      </AppProvider>
+        <DemoPageContent pathname={pathname} navigate={router.navigate} />
+      </DashboardLayout>
+    </AppProvider>
   );
-}
+};
 
 DashboardLayoutAccountSidebar.propTypes = {
   window: PropTypes.func,
