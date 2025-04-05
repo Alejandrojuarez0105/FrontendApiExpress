@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import LoginForm from "./components/LoginForm";
 import Dashboard from "./components/Dashboard";
-import { useUser } from "./context/UserContext";
+import { useUser, userGuest } from "./context/UserContext";
 import { UserProvider } from "./context/UserContext";
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 
@@ -99,15 +99,29 @@ const AppContent: React.FC = () => {
   const location = useLocation();
 
   useEffect(() => {
+    const cookies = document.cookie.split("; ").reduce((acc: Record<string, string>, current) => {
+      const [key, value] = current.split("=");
+      acc[key] = value;
+      return acc;
+    }, {});
+  
+    // Si hay cookie de invitado activa
+    if (cookies["guest"] === "true") {
+      setIsAuthenticated(true);
+      setUserId("0");
+      setUser(userGuest);
+      return;
+    }
+  
     const checkAuth = async () => {
       try {
         const response = await fetch(API_URL, {
           method: "GET",
           credentials: "include",
         });
-
+  
         const data = await response.json();
-
+  
         if (data.valid && data.user) {
           setIsAuthenticated(true);
           setUserId(data.user.userId);
@@ -120,9 +134,9 @@ const AppContent: React.FC = () => {
         setUser(null);
       }
     };
-
+  
     checkAuth();
-
+  
     if (location.pathname !== "/") {
       const interval = setInterval(checkAuth, 900000);
       return () => clearInterval(interval);
