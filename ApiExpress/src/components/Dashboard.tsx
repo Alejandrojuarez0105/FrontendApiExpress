@@ -26,6 +26,7 @@ import PaymentIcon from '@mui/icons-material/Payment';
 import Cuarto from './Cuartos';
 import Payment from './Payment';
 import UltimoPago from './UltimoPago';
+import Home from './Home';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 interface DemoPageContentProps {
@@ -121,8 +122,10 @@ function DemoPageContent({ pathname, navigate }: DemoPageContentProps & { naviga
               py: 4,
               display: 'flex',
               flexDirection: 'column',
+              minHeight: '100%',
               alignItems: 'center',
               textAlign: 'center',
+              backgroundColor: demoTheme.palette.background.default,
             }}
           >
             {!user || user._id === '0' ? (
@@ -152,8 +155,7 @@ function DemoPageContent({ pathname, navigate }: DemoPageContentProps & { naviga
               </Typography>
             ) : (
               <>
-                <Typography variant="h5">Bienvenido al Dashboard</Typography>
-                <UltimoPago />
+                <Home />
               </>
             )}
           </Box>
