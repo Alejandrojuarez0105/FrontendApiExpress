@@ -72,7 +72,7 @@ function PaymentTable({
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null); // Selected payment method
   const { reservations, setReservations, refreshReservations } = useReservations(); // Include refreshReservations
   const { user } = useUser(); // Retrieve user context here
-  const { fetchPayments } = usePayment(); // Retrieve fetchPayments from PaymentContext
+  const { fetchPayments, payments } = usePayment(); // Retrieve fetchPayments from PaymentContext
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -84,68 +84,65 @@ function PaymentTable({
   };
 
   const handlePay = async () => {
-    if (selectedReservation && selectedPaymentMethod) {
-      console.log('Selected reservation ID:', selectedReservation);
-
-      try {
-        if (!user || !user._id) {
-          throw new Error('Usuario no autenticado');
-        }
-
-        const paymentData = {
-          usuario_id: user._id,
-          monto: reservations.find((res) => res._id === selectedReservation)?.precio_total || 0,
-          metodo_pago: selectedPaymentMethod, // Use selected payment method
-          fecha_pago: new Date().toISOString().slice(0, 16).replace('T', ' ')
-        };
-
-        console.log('Payment data being sent:', paymentData);
-
-        const response = await fetch(`${API_BASE_URL}/pagos/reserva/${selectedReservation}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(paymentData),
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text(); // Handle non-JSON error responses
-          console.error('API error response:', errorText);
-          throw new Error(`Error al realizar el pago: ${response.statusText}`);
-        }
-
-        const responseData = await response.json();
-        console.log('Payment successful:', responseData);
-
-        setReservations((prevReservations) => {
-          const updatedReservations = prevReservations.map((res) => {
-            if (res._id === selectedReservation) {
-              console.log('Updating reservation:', res);
-              return { ...res, estado: 'confirmada' };
-            }
-            return res;
-          });
-          console.log('Updated reservations:', updatedReservations);
-          return updatedReservations;
-        });
-
-        await refreshReservations();
-
-        await fetchPayments();
-
-        setSnackbarOpen(true);
-
-        handleClose();
-      } catch (error) {
-        console.error('Error processing payment:', error);
-      }
-    } else {
-      console.log('No reservation selected for payment.');
+    if (!selectedReservation || !selectedPaymentMethod) {
+      console.error('No se ha seleccionado una reserva o un método de pago.');
+      return;
     }
+
+    if (!payments || payments.length === 0) {
+      console.error('No hay pagos disponibles.');
+      return;
+    }
+
+    const selectedPayment = payments.find(
+      (payment) => String(payment.reserva_id._id) === String(selectedReservation)
+    );
+
+    if (!selectedPayment) {
+      console.error('No se encontró un pago asociado a la reserva seleccionada.');
+      return;
+    }
+
+    try {
+
+      if (!user || !user._id) {
+        throw new Error('Usuario no autenticado');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/pagos/pagar/${selectedPayment._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          metodo_pago: selectedPaymentMethod,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error al confirmar el pago:', errorData.message);
+        return;
+      }
+
+      const data = await response.json();
+      console.log('Pago confirmado:', data);
+
+      await refreshReservations();
+
+      await fetchPayments();
+
+      setSnackbarOpen(true);
+
+      handleClose();
+
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+    }
+
   };
 
-  const pendingReservations = reservations.filter((res) => res.estado === 'pendiente'); // Filter pending reservations
+  const pendingReservations = reservations.filter((res) => res.estado === 'pendiente');
   console.log('Pending reservations:', pendingReservations);
 
   const columns: GridColDef[] = [
@@ -347,18 +344,18 @@ function PaymentDataGrid({ navigate }: { navigate: (path: string) => void }) {
         padding: theme.spacing(4),
       }}
     >
-      <Paper 
-        elevation={3} 
-        sx={{ 
-          p: 2, 
+      <Paper
+        elevation={3}
+        sx={{
+          p: 2,
           mb: 4,
           backgroundColor: theme.palette.background.default,
           boxShadow: `0 4px 20px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)`,
           borderRadius: 1
         }}
       >
-        <Typography 
-          variant="h4" 
+        <Typography
+          variant="h4"
           align="center"
           color="primary"
           sx={{

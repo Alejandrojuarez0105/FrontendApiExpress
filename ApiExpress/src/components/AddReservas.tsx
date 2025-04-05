@@ -168,12 +168,29 @@ const AddReservaForm: React.FC = () => {
       if (!response.ok) {
         throw new Error(data.message);
       }
+
+      const metodoPago = "Pendiente";
+
+      const pagoResponse = await fetch(`${API_BASE_URL}/pagos/crear/${data._id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ metodo_pago: metodoPago }),
+        credentials: "include",
+      });
+
+      const pago = await pagoResponse.json();
+
+      if (!pagoResponse.ok) {
+        throw new Error(pago.message);
+      }
+  
+      console.log("Pago pendiente creado:", pago);
       
       await refreshReservations();
       
       setNotification({
         open: true,
-        message: '¡Reserva creada con éxito!',
+        message: '¡Reserva y pago pendiente creados con éxito!',
         severity: 'success'
       });
       
